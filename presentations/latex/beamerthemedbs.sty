@@ -1,0 +1,159 @@
+%BSD 3-Clause License
+
+%Copyright (c) 2021, Fabian Gärtner, Daniel Obraczka, Martin Franke
+%All rights reserved.
+%
+%Redistribution and use in source and binary forms, with or without
+%modification, are permitted provided that the following conditions are met:
+%
+%* Redistributions of source code must retain the above copyright notice, this
+%list of conditions and the following disclaimer.
+%
+%* Redistributions in binary form must reproduce the above copyright notice,
+%this list of conditions and the following disclaimer in the documentation
+%and/or other materials provided with the distribution.
+%
+%* Neither the name of the copyright holder nor the names of its
+%contributors may be used to endorse or promote products derived from
+%this software without specific prior written permission.
+%
+%THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+%AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+%IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+%DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+%FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+%DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+%SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+%CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+%OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+%OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+\RequirePackage{tikz, datetime, graphicx}
+
+\usepackage[absolute,overlay]{textpos}
+\ifdefined\directlua
+  \setbeamerfont{section page}{size=\LARGE,series=\bfseries}
+  \setbeamerfont{title}{size=\LARGE,series=\bfseries}
+  \setbeamerfont{subtitle}{size=\large,series=\bfseries}
+  \setbeamerfont{frametitle}{size=\large,series=\bfseries}
+\else
+  \setbeamerfont{section page}{size=\LARGE,series=\bfseries}
+  \setbeamerfont{title}{size=\LARGE,series=\bfseries}
+  \setbeamerfont{subtitle}{size=\large,series=\bfseries}
+  \setbeamerfont{frametitle}{size=\large,series=\bfseries}
+\fi
+
+
+
+\yyyymmdddate \renewcommand{\dateseparator}{.}
+
+\definecolor{dbs_grey}{RGB}{122, 123, 122}
+\definecolor{dbs_light_blue}{RGB}{192, 208, 224}
+\definecolor{dbs_dark_blue}{RGB}{32, 64, 96}
+\definecolor{dbs_hilite}{RGB}{204, 85, 34}
+
+\setbeamercolor*{title page header}{fg=dbs_dark_blue}
+\setbeamercolor*{title}{fg=dbs_dark_blue}
+\setbeamercolor*{subtitle}{fg=dbs_hilite}
+\setbeamercolor*{author}{fg=dbs_dark_blue}
+\setbeamercolor*{institute}{fg=dbs_dark_blue}
+\setbeamercolor*{date}{fg=dbs_light_blue}
+\setbeamercolor*{item}{fg=dbs_light_blue}
+\setbeamercolor*{frametitle}{fg=dbs_dark_blue}
+\setbeamercolor*{block title}{fg=white, bg=dbs_hilite}
+\setbeamercolor*{block body}{bg=dbs_hilite!20}
+\setbeamercolor*{section in toc}{fg=black}
+\setbeamercolor*{section page}{fg=dbs_dark_blue}
+\setbeamercolor*{foot}{fg=dbs_blue}
+\setbeamercolor*{section in head/foot}{fg=dbs_grey}
+
+\setbeamerfont{author}{size=\large,series=\sffamily}
+\setbeamerfont{institute}{size=\small, series=\sffamily}
+
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{items}[square]
+\setbeamertemplate{sections/subsections in toc}[square]
+
+\newenvironment{xplainframe}{\bgroup\setbeamertemplate{background}{}\begin{frame}[plain]}{\end{frame}\egroup}
+
+\setbeamertemplate{background}{
+    \begin{tikzpicture}[remember picture, overlay]
+      	\node[yshift=0.61cm,xshift=-1.5cm] (unile) at (current page.south east)
+      	{\includegraphics[width=0.15\textwidth]{Logos/UniLEBigger.png}};
+       	\node[yshift=-1.4cm,xshift=-1.4cm] (bubble) at (current page.north east)
+      	{\includegraphics[width=0.2\textwidth]{Logos/dbsbubble.png}};
+     	\ifnum\thepage=1\relax% title page
+        	\node[xshift=4cm,yshift=2.5cm] (unilebig) at (current page.west)
+          	{\includegraphics[width=0.5\textwidth]{Logos/logo.png}};
+	 	\else      
+	 		\node[yshift=0.6cm,xshift=2.6cm] (dbs) at (current page.south west)
+      		{\includegraphics[width=0.3\textwidth]{Logos/logo.png}};
+      		\draw[gray] (dbs.north west) -- (unile.north east);
+      	\fi 
+    \end{tikzpicture}
+}
+
+
+\setbeamertemplate{title page}{
+	\begin{textblock*}{8cm}(2.2cm,4.8cm)
+    \begin{beamercolorbox}[wd=8cm,left]{title page header}
+        \usebeamerfont{title}\usebeamercolor{title}\inserttitle%
+    \end{beamercolorbox}
+    \end{textblock*}
+	\begin{textblock*}{8cm}(2.2cm,5.4cm)
+		\begin{beamercolorbox}[wd=8cm,left]{subtitle}
+			\usebeamerfont{subtitle}\usebeamercolor{subtitle}%
+			\insertsubtitle
+		\end{beamercolorbox}
+	\end{textblock*}
+    \begin{textblock*}{8cm}(2.2cm,6.2cm)
+	    \begin{beamercolorbox}[wd=8cm,left]{author}
+	      \usebeamerfont{author}\insertauthor%
+    	\end{beamercolorbox}
+    \end{textblock*}
+	\begin{textblock*}{8cm}(2.2cm,6.7cm)
+		\begin{beamercolorbox}[wd=8cm,left]{institute}
+			\usebeamerfont{institute}\insertinstitute%
+		\end{beamercolorbox}
+	\end{textblock*}
+}
+
+\AtBeginSection[] % Do nothing for \section*
+{
+	\ifnum\thepage>2\relax%
+	\frame{\sectionpage}
+	\fi
+}
+
+\setbeamertemplate{section page}{
+	\begin{textblock*}{\paperwidth}(0cm,4cm)
+		\begin{beamercolorbox}[wd=\paperwidth, center]{section page}
+			\insertsectionhead
+		\end{beamercolorbox}
+	\end{textblock*}
+}
+
+
+\setbeamertemplate{frametitle}{
+	\vspace{0.8cm}
+	\begin{beamercolorbox}{frametitle}
+			\insertframetitle
+	\end{beamercolorbox}
+}
+
+
+\setbeamertemplate{footline}
+{ 
+	\ifnum\thepage>1\relax%
+      \begin{textblock*}{10cm}(5cm,8.33cm)
+          \begin{beamercolorbox}{section in head/foot}
+            \insertauthor \medspace : \medspace \inserttitle
+          \end{beamercolorbox}
+      \end{textblock*}
+      \begin{textblock*}{4cm}(12cm,8.33cm)
+          \begin{beamercolorbox}{section in head/foot}
+            Slide \insertframenumber{}/\inserttotalframenumber
+          \end{beamercolorbox}
+      \end{textblock*}
+	\fi
+}

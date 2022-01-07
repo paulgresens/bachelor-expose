@@ -1,0 +1,89 @@
+\documentclass[aspectratio=169]{beamer}
+
+\usefonttheme[onlymath]{serif}
+
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{tcolorbox}
+\usepackage{listings}
+
+% dbs or uni
+\usetheme{dbs}
+
+
+
+\title{A Very Important Topic}
+\subtitle{With More Info in the Subtitle}
+\author{Jane Doe \& Max Mustermann}
+\institute{Database Group\\University of Leipzig}
+\date{07.01.2021}
+
+
+\usepackage[backend=bibtex, style=authoryear-comp]{biblatex}
+\addbibresource{references.bib}
+\newcommand{\tinycite}[1]{\tiny{\citeauthor{#1}, \citetitle{#1}, \citeyear{#1}}} 
+\newcommand{\normalcite}[1]{\citeauthor{#1}, \citetitle{#1}, \citeyear{#1}} 
+\addtobeamertemplate{footnote}{}{\vspace{4ex}}
+
+\begin{document}
+  
+  
+  \begin{frame}[plain]
+    \titlepage{}
+  \end{frame}
+  
+  
+\begin{frame}{My topic is important\dots }
+\begin{itemize}
+  \item Here is some general statement 
+  \item More information about my topic includes these points: 
+    \begin{itemize}
+      \item A thought
+      \item Another idea
+      \item A related thing 
+      \item \dots
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{\dots but it is a difficult task}
+  Because of reasons
+  \begin{block}{Block title}
+    I am a block environment 
+  \end{block}
+\end{frame}
+\begin{frame}{Outline}
+\tableofcontents[hideallsubsections]
+\end{frame}
+
+
+\section[A short section title]{I am a longer section title}
+\section{Summary}
+
+\begin{frame}
+
+\end{frame}
+
+\begin{frame}
+
+\end{frame}
+
+\begin{frame}
+
+\end{frame}
+
+\begin{frame}
+
+\end{frame}
+
+\begin{frame}
+
+\end{frame}
+
+\begin{frame}
+
+\end{frame}
+
+
+\end{document}
