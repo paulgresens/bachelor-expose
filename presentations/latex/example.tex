@@ -1,20 +1,23 @@
+% currently only working for 16:9 slides
+% using 4:3 will cause the footer to be misaligned
 \documentclass[aspectratio=169]{beamer}
 
-\usefonttheme[onlymath]{serif}
 
 \usepackage{xcolor}
 \usepackage{amsmath}
 \usepackage{tcolorbox}
 \usepackage{listings}
+\usepackage{url}
 
 % dbs or uni
-\usetheme{dbs}
+\usetheme{uni}
 
 
 
 \title{A Very Important Topic}
 \subtitle{With More Info in the Subtitle}
 \author{Jane Doe \& Max Mustermann}
+\urldef{\mail}\path|myemail@informatik.uni-leipzig.de|
 \institute{Database Group\\University of Leipzig}
 \date{07.01.2021}
 
@@ -28,9 +31,7 @@
 \begin{document}
   
   
-  \begin{frame}[plain]
-    \titlepage{}
-  \end{frame}
+\maketitlepage
   
   
 \begin{frame}{My topic is important\dots }
@@ -53,17 +54,22 @@
     I am a block environment 
   \end{block}
 \end{frame}
+
+
 \begin{frame}{Outline}
 \tableofcontents[hideallsubsections]
 \end{frame}
 
 
 \section[A short section title]{I am a longer section title}
-\section{Summary}
 
 \begin{frame}
 
 \end{frame}
+
+
+\section{Summary}
+
 
 \begin{frame}
 
