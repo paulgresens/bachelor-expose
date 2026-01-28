@@ -1,2 +1,48 @@
 \chapter{Related Work}
 \label{cha:RelatedWork}
+
+In order to develop systems that are capable of adressing complex real-world inquiries, collecting information from a vast corpus of sources and providing selected spans alongside the answer to enhance trustworthyness, datasets are needed in order to measure their effectiveness in doing so. Depending on the domain such systems are applied onto, the requirements for such datasets have tremendous differences in their requirements. (TODO EXAMPLE HERE). \\
+The scientific qa setting comes with its own characteristics. Compared to other domains underlying data in forms of scientific papers, journals, etc. is highly trustworthy, comes in standardized formats and contains references to other related work, making it easy to find justification for claims made. Also scientific literate has the advantage of having precise terminology and data rich descriptions compared to other domains, where datasets suffer from ambiguity and missing context. On the downside however posing as well as answering questions requires a high degree of background and domain specific knowledge as well as requiring reasoning, critical and contextual thinking capabilities, something mostly only experts in their fields are capable of. As a result the scientific qa fields suffers from a scarcity of datasets, as curating such comes with high cost and time intensive labor by experts. Beyond these already challenging requirements, developing an open domain scientific QA system like SQuAI poses further requirements datasets must fullfill in order to fully utilize and enable measurement of the capabilities such open domain systems must posess:
+\begin{enumerate}
+    \item Domain Alignment: Questions must fall under the knowledge scope of the underlying knowledgebase, in order for the system to be able to provide proof alongside its answer. In terms of the SQuAI System this boils down to questions targeting physics, mathematics and computer science and are also part of the papers in the UnarXive 2024 Dataset.
+    \item Reasoning Complexity: Questions must go beyond simple factoid questions and require complex reasoning capabilities to answer, as questions posed by scientists usually require synthesizing, interpreting and evaluation data, requiring high cognitive abilities, to interact with. Ideally a dataset should reflect that. 
+    \item Multi-Hop Reasoning: Questions must require the information in multiple documents to be answerd, in order to the test the ability of the system to synthesize information from multiple sources, as is required in naturally occuring scientific reasearch.
+    need to analyzse numerous sources and evaluate complementing, contradicting or 
+    \item Open Domain: Questions must be answerable in an open domain settings and cannot contain any kind of reference to specific papers and their contents, that lose meaning or become ambiguous outside of the context of their paper. As a result questions must contain enough context such that they are standalone answerable and dont require any additional context to be unambiguous.
+    \item Ground Truth: In order to evaluate the correctness not only for the models answer but also its proof a dataset should include a ground truth alonside granular proof, mapping each claims to precise text spans in the underlying knowledgebase to ground its answer.
+    %todo i will be breaking this, later discuss why
+\end{enumerate}
+
+Systematic evalation of these criteria reveals however, that of the existing popular and high quality datasets, none really fits all requirements simultaniously.
+
+
+
+
+
+%enhance
+% a lot of squai dataset specific stuff before talking about why all other datasets fail
+%- make this sentence better: On the downside however posing as well as answering questions requires a high degree of background and domain specific knowledge as well as requiring reasoning, critical and contextual thinking capabilities, something mostly only experts in their fields are capable of.
+
+
+% CONTENT: 
+%  - current methods (dataset - retrieval - evaluation)
+%  - why current datasets not sufficient
+%  
+% Find relevant papers (iEEE explose, acm digital library, google scholar) - find using correct keywords
+
+
+%advantages in scientific qa
+% high quality, trustworthy data
+% standardized document strucutre
+% ciation network, highly linked
+% precise terminology
+% data density/richness
+%
+%disadvantages in scientific qa
+% complex reasoning , multihop
+% high specialization/ implicit knowledge
+% data scarcity, annotation cost
+% docment length, linearity
+% high stake for hallucinations
+%
+

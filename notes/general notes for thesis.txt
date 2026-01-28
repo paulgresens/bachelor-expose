@@ -1,0 +1,10 @@
+- look for notes in existing sections + these ones:
+
+
+evaluation:
+ALCE benchark does also do a lot of evaluation (look related work - partially analysed paper)
+    -maybe add: MAUVE (fluency check of output) 
+    -also measures correctness
+
+
+-show why post hoc is good

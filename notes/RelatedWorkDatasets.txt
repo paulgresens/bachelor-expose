@@ -1,0 +1,175 @@
+requirements for my dataset:
+domain alignment: questions must fall into the knowledge scope of the unarXive 2024 Dataset that SQuAI uses
+    -lot of datasets target biomedical (verify!)
+    -unArxive targets physics, math, cs, quantitative biology (verify)    
+
+complex questions: 
+    - SQuAI aims to answer complex scientific questions, a good dataset should reflect that, ideally questions are obtained by experts, but that’s too expensive for a bachelor's thesis
+    - decomposeablity?
+multi document reasoning questions 
+    - (because of 4 agent pipeline, question decomposition), multi-hop
+
+CONTEXT INDEPENDENCE / open domain questions: questions must contain all context to be standalone answerable
+    -this includes not:
+    -referencing the paper or its content the questions is originally based on
+    -example “What is the significance of the parameter λ in the context of this paper?”
+    -referencing concepts which are not uniquely identifiable without the general context of the paper
+    -example: “What is the Island Concept” (references a well known concept that loses its identifiability without knowing which general topic is talked about)
+
+text format: 
+    - currently SQuAI solely relies on information in the full text of papers without any data from graphs/ images, thus questions may only target those knowledge
+
+ground truth: 
+    - needed to evaluate if the model answers correctly
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+current Datasets:
+-Qasper
+    domain alignment: only 1585 NLP papers (really narrow, not as wide as squai)
+    complex questions: simple factual lookup: 1909.00694:  "What is the seed lexicon", 1909.00430:  "How much more data does the model trained using XR loss have access to, compared to the fully supervised model"
+    multi document reasoning questions : no, single paper ("grounded in a single paper of interest")
+    context independence: not independant, implicit references to papers, contents
+    text format: yes
+    ground truth: yes
+notes: 
+    -question written as follow to of title, abstract of particular paper (vertiefend nachfragen quasi, Questionschreibe sehen nur Title und Abstract, nur Fragen nicht beantwortbar von diesen), answer identified in paper --> promises that questions require more complex document level reasoning (abstract --> rich promp, academic papers naturally trigger question that require supporting or refuting claims)
+    - human written questions by regular NLP paper readers, answered by seperate people + serached evidence in paper by the answerer (answerer access to fulltext and graps/ images) --> only questions they deemed answerable stay in dataset
+    --> focuses on entire papers
+    --> shows that state of the art transformer (2017) lags behind humans in answering questions and providing evidence 
+    -67% of questions were specific to the paper they are written on
+    -short, most are extractive answers (avg. 14.4), also there are abstractive answers (avg. 15.6) 
+
+-ALCE benchmark
+    domain alignment: no, context is general knowledge or explanation, lacks scientific background
+    complex questions: ALCE targets long text generation and synthetization (+) but only shallow reasoning not suitable for scientific literature due to its underlying dataset (-)
+    multi document reasoning questions : 
+    context independence: yes, questions are standalone 
+    text format: yes
+    ground truth: yes, but possibly not trustworthy
+        - no source mapping 
+notes:
+    -claim: evaluation must be automated, is a benchmark for automatically evaluating LLMs generations with citations
+    -evaluates long text generation, allows citing multiple passages for individual statements
+    -evaluates: fluency (MAUVE), correctness (NLI), citation quality
+    - 3 datasets
+        -ASQA: long form factoid dataset, AMBIGUOUS question form AmbigQA (requires multiple short answers (2018-12-20 Wikipedi corpus))
+        -QAMPIRI: factoid QA dataset constructed from Wikipedia, answer is a list of entities drawn from different passages (2018-12-20 Wikipedi corpus)
+        -ELI5: long form QA Dataset, built on Reddit "Explain like im five" (How, Why, What, ...), "Sphere" as Corpus, ELI5 is widely used due to its challenging nature
+
+-SPIQA
+    domain alignment: strong domain alignment (cs questions), multimodal, questions are designed to be unanswerable without interpreting visual data
+    complex questions: yeah but not answerable using only text
+    multi document reasoning questions : only intra document retrieval
+    context independence: questions often anchored to to papers visual context
+    text format: noooo
+    ground truth: nooo, can only be answered using graphcs, figures etc as well, answer given there
+notes:
+    - high quality dataset, but not fitting
+    - reasoning over textual paragraphs, figures, tables, graphs
+    - introduces LLMLogScore (L3Score)
+    - understanding scientific literature includes verifying claims with experiment results and visualizations
+    - also tells why qa datasets are limited / expensive etc
+    - other qa datasets only use textual content, this one takes into accunt figures, tables, graphcs
+    - qasa and qasper related? - nice overview of other datasets in the related work section
+    - PubmedQA, BioAsq and Qasper construct corpora where huamn asker can only see the abstract --> hence simple yes no or short span answerable questions
+    - QASA genreates questions where annotators can see full text but still ignores graphs
+
+-QASA (Advanced Question Answering on Scientific Articles)
+    domain alignment: strong domain alignment, targets complex computer science topics
+    complex questions: semantically deep questions, requiring some reasoning, but limited to single documents
+    multi document reasoning questions : no, single document
+    context independence: better than qasper, but many questions stil imply the context of the specific paper / reference it
+    text format: yes
+    ground truth:
+notes:
+    -Qasper questions are shallow 
+    - models thinking process
+    - dual process theory says that human reasoning consists of associative thinking to collect relevant piesces of knowledge and logical reasoning to consciously conclude grounding on evidentional rational (first associative thinking, then logical reasoning)
+    -qa datasets often only require 
+    -qasa provides qa pairs that requires full stack reasoning (surface, testing and deep questions)
+    - human generated questions while reading the whole paper, multi faceted long-form answers + composed short form and fluent answer
+
+
+ExpertQA
+    domain alignment: strong match if sorted out to the fields that squai also has
+    complex questions: strong match, challending, require reasoning and open-ended
+    multi document reasoning questions : yes, but sources are weblinks, not scientific papers
+    context independence: stron match, questions are context independant
+    text format: yes
+    ground truth: ground truths are given, but they are weblinks not scientific papers --> hard evaluation or filtering to squai dataset
+    --> only 2177 examples over 32 fields --> way to small if filtered to unArxive information (todo make educated guess how many left after filtering here)
+    --> GOLD standard but unsuitable
+notes:
+    -expert curated questions, then ask expert to evaluate responses to their own questions and improve upon those responses (expert in the loop evaluation) --> tries to simulate information seeking scenario with experts
+    -field relevant questions as well as claim level judgement
+    -verifyability is important for high stake fields (e. g. medicine and law)
+    - questions are collected by askins experts what they are curious about or what they have encountered --> no concrete fact basis
+    - questions answerd by LLM based systems with attributions (purely generative, retrieval augmented, post hoc)
+    - answer and evidence then judged by expoert for informativeness, citeworthiness and factuality (and how faithfull claim is to accompanying evidence and how reliable the evidence's source is) 
+    - finally experts revise each claim, so it is faithful to reliable evidences and factually correct
+    - 1. Retrieve-and-read systems generate more complete attributions compared to LLM prompting and post-hoc attribution, but struggle to produce citations for all cite-worthy claims.
+    - 2. The retrieval source significantly impacts the quality of attribution and overall factuality.
+    3. High-stakes domains such as medicine and law suffer from a large percentage of incomplete attributions (35% and 31% incomplete attributions respectively) and many attributions come from unreliable sources (51% attributions are not rated reliable by experts).
+    - also measures that automtic methods for attribution and factuality fall short to the experts evaluation afterwards
+
+
+SciDQA
+    domain alignment: strong match (ML), 
+    complex questions: not properly decontextualized only linguistic decontextualization, their decontextualization includes only third person, removing bias, still anchored to the specific paper
+    multi document reasoning questions : only 10,9% of questions require multiple documents
+    context independence: 
+    text format: no, requires reasoning over non text based information (~50%)
+    ground truth: given answer text
+notes:
+    -
+    -also has comparison overview of qa datasets
+    -scientific literature is dense and requires deep understand and background knowledge to interact with
+    -2937 questions, dataset ML domain, sources from peer rewies on the open review platforms (quetsions from reviewers, answered by writer of paper - both domain experts) --> tries to be a dataset with deep comprehension questions of the paper
+    - human annotation of questions, since not all are relevant (keeping most relevant questions, rewriting both question and answer to be "context independant"(third person, no biasing language, + a little more context) and edit references(so its clear for example which figure is meant)), sort out only the information seeking ones (sometimes requireing multiple papers)
+    - questions include information provided in graphs, figures, tables, equations,...
+
+
+PeerQA
+    domain alignment: strong alignment
+    complex questions: strong match, deep level understanding complex questions, expert level question
+    multi document reasoning questions : only focused on a single paper
+    context independence: only linguistic decontextualizations, specific references to content of papers
+    text format: designed as text only benchmark, mostly text based, only text provided as evidence
+    ground truth: provides annotated evidence spans, full answer text (very good)
+notes:
+    -579 labeled qa pairs with answrs from 208 articels (very few!!!!), mainly ML and NLP (90%) but also geoscience and public health
+    -12k unlabeled questions
+    - sources from human written peer reviews, answers by paper authors --> (naturally raised by reviewer compared to qasa, qasper where one person comes up with question and answer)
+    - questions only target single paper
+    - questions are decontextualized and split up, filter to only information seeking
+    - authors themselfes provide answer and the relevant text spans for answer grounding
+
+
+
+    domain alignment: 
+    complex questions:
+    multi document reasoning questions :
+    context independence: 
+    text format: 
+    ground truth:
+
+
+
+
+
+-PubMedQA
+-ScIRGEN
+-M3SciQA
+-SciQA
+-SciTat
+-ScholarQABench
+-LitQA / LAB-Bench
+
+
+dataset generation
+-sciqag
+-fin qa?
+
+datasets mentioned but not useful:
+-SciFact : input claim --> output verificatinon (proof/contradict of that), no questions in the dataset (only declarative statements from papers abstract)

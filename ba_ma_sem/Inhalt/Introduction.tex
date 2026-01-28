@@ -1,3 +1,48 @@
 \chapter{Introduction}
 \label{cha:Introduction}
-\lipsum \autocite{DummyCite}
+%\lipsum \autocite{DummyCite}
+
+Large Language Models (LLMs) have fundamentally transformed how we look up information and obtain answers to our questions, becoming an increasingly important tool, not only in everyday life, but also across a range of professional fields. However, even with increasing model performance, their answers remain quite prone to hallucinations, making it hard for users to verify the their factual correctness. Depending on the field of application this might have rather severe consequences, for example in scientific research, a field where drawn conclusions do heavily rely on premises, possibly researched in the process, using an LLM. One increasingly popular approach is Retrieval Augmented Generation (RAG), grounding the models response, by providing it a factual basis in the form of external documents, to generate its answer upon \cite{sharma2025retrievalaugmentedgenerationcomprehensivesurvey}. The RAG approach itself however, does still fall short of enabling granular proof for the models answer, at best providing a source at document level. As a consequence, especially for use cases where this degree of verifiability is crucial, the need for systems capable of providing it, arises.\\One such approach comes in the form of the SQuAI System, a multi-agent RAG Framework, for reliably answering scientific questions while providing sentence level citations as proof to the user \cite{SQuAI}. In order to do so, SQuAI relies on a six step pipeline with four agents, decomposing the question into multiple distinct subquestion, retrieving relevant papers, generating Question-Answer-Evidence triplets from the papers, sorting out irrelevant papers judging by the Q-A-E triplet and finally using the information in the leftover papers to answer the user's question with sentence to document level linking as proof. After the generation of the answer, in what is known as Post-Hoc Attribution, the system then opts for a more granular attribution, extracting citations from each of the papers, replacing the sentence-document level attributions with more fine grained, sentence level ones. While SQuAI implements a sophisticated pipeline for its answer generation, the cited text span extraction currently relies on brittle keyword matching, a significant weakness i want to improve on in my work. To overcome this limitation i will apply a number of different methods, starting with keyword matching, over semantic encodings, re-ranking using Cross-Encoders and finally LLMs as well as combinations of said methods test their synergy. \\
+Evaluating such systems comes with a set of challenges on their own. Especially in the scientific domain SQuAI is applied to, datasets are comparetively scarce and expensive to curate. Existing and widely used Datasets such as ... TODO INSERT EXAMPLES - dont fit requirements because .... . 
+In order to solve this i propose an automated pipeline for generating high quality scientific questions, using the same set of papers the SQuAI system utilizes as its knowdledgebase. Taking multiple, each other citing and thus related papers into account, extracting overlapping, contradicting or complementing information in the papers, the pipeline then constructs a Question-Answer-Evidence triplet, resulting in a scientific question that can only be answered by synthesizing the information provided by multiple papers. Using this method i create a dataset of questions that are not only highly aligned with the SQuAI domain, but also show increased complexity beyond  simple lookup.\\
+Using this dataset i will then apply a variety of evalution methods measuring the retrieval capabilities of the squai system, as well as its ability to properly extract cited text spans as proof for its claims. For the former i will apply a number of quality and quantity measurements like precision, recall, F1-Score and more to evaluate the retrieval capabilities. For the latter, i will apply an LLM-as-a-judge evaluation approach, as well as Natural Language Inference (NLI) to further asses the logical entailment and faithfullness the citations provide.
+
+%noch verbessern:
+%mmmh naja: The RAG approach itself however, does still fall short of providing granular proof for the models answer, at best providing a source at document level.   
+% maybe add illustration for squai
+% mention unArXive 2024
+% depending on if human evaluation plays a part add that
+
+
+%additions
+% PeerQA paper: number of scientific articles is increasing exponentially --> need new tools to stay up to date
+
+
+%
+% hallucination
+% consequences
+% need for verification 
+% LLM good at synthesizing, but prone to hallucination
+%
+% hard to verify because of lacking domain knowledge, time, no knowledge about sources false conclusions without any data
+%RAG - briefly mention squai
+% - does not link back to specific text spans
+%briefly mention post vs pre hoc (squai post) - text based
+% what im planning on solving, we cant even measure without a good dataset / expensive human evaluation --> curate that
+% how to improve & still get good performance (keyword, semantic --> increasing complexity while still having ), tradeof
+%   -dataset - extaction -evalutino
+% maybe example
+% 
+%
+
+
+%Things to mention in the thesis:
+%alternatives to rag: -iterative feedback loops -supervised fine-tuning -prompt engineering -self-reflection methodologies
+%
+%
+%
+%
+
+
+% models are nutoriously bad at multitasking (pre hoc, take as exmaple dataset citation generation)
+% lexical missmatch --> could not realise ambiguity

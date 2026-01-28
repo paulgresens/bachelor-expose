@@ -1,0 +1,19 @@
+papers that i look at at related work dataset curation, that also do some citation thingies:
+
+ALCE benchmark
+only 2 post hoc methods:
+    - sample 4 best responses, rerank  using automatic citation recall score (defined in this paper, based on entailment rating by NLI)
+    - from top 100 passages use dense retriever to find best one
+
+qasper (pre hoc approach - so not relevant)
+-every paragraph gets <s> token, , decide with binary classification if paragraph relevant or not
+
+qasa
+-
+--------------------------------------------------------------------------------------------
+
+
+look at this in the future:
+https://arxiv.org/pdf/2005.08319
+https://arxiv.org/pdf/2309.06365v2
+https://arxiv.org/pdf/2509.21557
