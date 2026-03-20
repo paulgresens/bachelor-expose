@@ -1,6 +1,69 @@
 \chapter{Methodology and Approach}
 \label{cha:MethodologyAndApproach}
 
+\section{Dataset}
+% things to mention:
+% ids only from the ones of unArxive 2024
+% randomly select paperId, get References and specter vectors from semantic scholar
+% filter to references in unArxive 2024 dataset
+% calculate cosine similarity between papers
+% filter for cosine similarity > 0,7 and <0,9
+% select 4 additional papers
+% if not enough are valid, skip this question
 
+% calculate adaptive individual character limit 
+     % longer papers get more leftovers: adaptiveCharacterLimit = int(PAPER_CHARACTER_LIMIT + (len(text) / totalCharsInAbove50kPapers) * charactersLeftFromSub50kPapers)
+% take half of individual character limits from beginning/ end of paper (highest information density)
+% prompt LLM 
+    % extract 10 topic overlaps, contradict or complementing, identify entities/concepts    
+    % generate 1 question - answer pair 
+    % requires information in multiple papers, synthesizing, resolving, applying , evaluating information
+    % context independent / standalone answerable
+    % complex scientific questions, not just simple/ definitial questions
+    % question answer as precise as possible
+    % add arxiv ids of used papers
+
+% CoT prompt additional LLM for the question-answer pair and each individual paper text to determine wether it was used or not
+% 
+
+% talk about how the dataset looks
+To curate a dataset of high-quality, expert-level scientific question-answer pairs, a fully automated pipeline is applied. 
+It consists of three consecutive steps: document selection, question answer generation and document usage verification, in order to ensure that generated questions and answers are scientifically rigorous and strictly dependent on multi-document information synthesis to be answered, as well as reliably providing associated ground truth documents alongside.
+\subsection{Document selection}
+To match the underlying document corpus, selectable papers are restricted to those of the unArXive2024 dataset, yet in theory this could be expanded at will. A randomly selected anchor paper as well as its cited references serve as the foundation for generating a single question-answer pair, ensuring broad coverage across the whole dataset. For each paper, a document-level SPECTER \cite{specter} vector embedding is retrieved via the Semantic Scholar academic graph API \cite{semanticScholarApi}. Leveraging citation graphs, these vectors provide dense representations of a paper's title and abstract, which are subsequently used to calculate the cosine similarity and thus the semantic similarity of each paper with the anchor document. To ensure topical alignment while excluding highly redundant work, a subset of candidate papers with a cosine similarity between 0.7 and 0.9 is selected. Four of these papers are then chosen at random to be used alongside the anchor paper for further generation. Restricting the model input to five papers in total provides a multitude of topical overlaps for the model to choose from without resulting in exceedingly long prompts, mitigating the risk of "Lost in the Middle" effects. If a chosen anchor paper fails to provide at least four appropriate references, it is considered insufficient to be used in the dataset.
+% rephrase realized, rephrase docuemnt usage verification
+% justify 0.7 to 0.9
+% maybe dont mention lost in the middle just here
+
+\subsection{Question-Answer generation}
+While modern LLMs offer increasingly large context windows, usually even above 100,000 tokens, empirical studies have shown severe performance degredation in tasks like complex reasoning, data retrieval and logic problems, accompanied by drastically increased hallucination \cite{contextIsWhatYouNeed}. In the generation step, the pipeline applies a Qwen/Qwen2.5-72B-Instruct \cite{qwen2.5-72B-Instruct} model, shown to have an effective context size with minimal degredation of about 32k tokens \cite{ruler}. Although the model can be changed at will, for this specific configuration, the input should not exceed ~128,000 \footnote{in standard heuristics for scientific english one token translates to roughly four characters} characters, thus ~25,000 characters per paper - the base limit.
+With papers being highly variable in length, an adaptive per paper character limit is applied, distributing leftover characters from papers shorter than the base limit, weighted by paper length. Thus, the adaptive character limit for papers with a length greater then the base limit can be determined by: 
+\begin{equation}
+C_{adaptive} = \left\lfloor C_{base} + \left( \frac{l_{paper}}{\sum_{p \in P_{above}} len(p)} \right) \times \sum_{s \in P_{below}} (C_{base} - len(s)) \right\rfloor
+\end{equation}
+Paper texts longer than their adaptive character limit are then head and tail truncated, retaining the first and last $\frac{C_{adaptive}}{2}$ characters which are usually the most information dense for scientific papers.
+
+Subsequently the LLM is prompted using a two-step strategy. Firstly the model is tasked with extracting topic overlaps between papers, identifying important concepts and entities as well topical relationships between documents. The following step is the generation step, where the model is prompted to generate one high quality and complex question-answer pair targeting a subset of the previously extracted concepts or entities. The model is incentivized to avoid simple definitional questions, instead opting for complex inquiries, that require information synthesis and evaluation across multiple source documents in order to be answered. Additionally, the model is instructed to answer the question as precisely as possible, providing a precision-biased subset of the underlying papers used during generation alongside. The complete prompt instructions are provided in Listing \ref{lst:questionAnswerGenerationPrompt}.
+% add more explanation on why stuff is done like this
+
+
+
+% Lost in the Middle: How Language Models Use Long Contexts" (Liu et al., 2023).
+
+% hallucinating used papers
+% lazily attributing to many
+% judge every single paper if really used, 
+% CoT prompting, 
+\subsection{Document usage verification}
+Generative LLMs have been shown to be notoriously prone to hallucinating citations and falsely attributing sources. Thus, their ability to reliably track a paper's actual contribution to the generated question-answer pair is drastically reduced. In order to mitigate this and ensure the dataset's integrity, a verification step is applied, employing a secondary LLM, specifically mistralai/Mixtral-8x7B-Instruct-v0.1 \cite{Mixtral-8x7B-Instruct-v0.1}, to act as a judge for the actual usage of each paper individually. Utilizing a Chain-of-Thought (CoT) approach, the model is first instructed to identify core scientific claims and topics in the question-answer pair, before determining if a paper provides explicit evidence or data beyond mere keyword overlap, supporting the claims made in the answer, resulting in a final binary verdict for each paper. The complete prompt instructions are provided in Listing \ref{lst:usageJudgementPrompt}.
+    
+The full dataset is then obtained by applying a consensus filter between both generator and judge, discarding all question-answer pairs with fewer than two source documents attributed by both LLMs, ensuring true multihop characteristic for the whole dataset.
+
+
+\section{Cited text span extraction}
+\section{Span evaluation}
+
+
+% add method of extraction
 % describe how squai paper obtained full text from latex
 % write that when constructing the dataset and adding quotes the quality of questions and quotes significantly decreased

@@ -1,0 +1,266 @@
+
+(AIS) Measuring Attribution in Natural Language Generation Models: https://arxiv.org/abs/2112.12870
+-ONLY CONCEPTUAL to get a unified framework
+-framework wether a models output can be be corroborated by specific background source
+-(statement is AIS iff test agrees with "according to source A, statement S is true)
+-explicatures: standalone sentence that preserves truth outside of context (replacing "he", ...)
+-2 step pipeline:
+    - Is the claim interpretable on its own?
+    - Does the extracted span support 100% of the information in the claim without any outside assumption
+
+
+
+Evaluating the Factual Consistency of Abstractive Text Summarization:https://arxiv.org/abs/1910.12840 (FactCC)
+---related:
+- Goodrich et al. (2019) - automatic metric for evaluating factual accurayc of generated texts
+- (Nallapati et al., 2016) - out of the box NLI does not transfer well to task of factual correctness checking
+        - ROUGE does not correlate with factual correctness
+- "Primarily, checking factual consistency on a sentence-sentence level, where each sentence of the summary is verified against each sentence from the source document, is insufficient." (some require multiple sentences as justification)
+---method:
+-each sentence verified against the whole of the paper 
+-artificial dataset with artificial hallucination (negations, double words, entity/ number swapping...)
+-finetuned bert model, outputs CONSISTENT/ INCONSISTENT and the precise span
+-majority of mistakes are commonsense mistakes, sometimes errors stemming from dependencies between different sentences  (incorrect coreferenec, temporal inconsistencies)
+
+
+
+SummaC (2022): https://arxiv.org/abs/2111.09525
+---related:
+-NLI for inconsistency detections
+-running entire document at once leads to wrong evaluation if the claims are entailed
+-segment documents into sentence units and aggregate scores between pairs of sentences (cross pairing sentences from answer and source)
+-inconsistency detection closely related to textual entailment
+-or that out-of-the-box NLI models obtain 52% accuracy at the binary classification task of inconsistency detection, only slightly above random guessing (Kryscinski et al., 2020).
+    -->this is fixed with appropriate granularity (sentence level)
+- In the summary inconsistency detection domain, the focus is on detecting any inconsistency, regardless of its accuracy, as prior work has shown that current automatic summarizers are predominantly inaccurate when inconsistent (Maynez et al., 2020).
+----method:
+-paper text and answer text split into parts (paragraphs, sentences etc.) then run each combination through the NLI model
+    -SUMMACzs takes max entailment of each of those, then take the mean of the resulting 1 column vector
+    -SUMMACconv take every etailment into account, calculate score from this for each (weighted in 50 intervals, so kinda just like weighted mean)
+
+
+
+TRUE: Re-evaluating Factual Consistency Evaluation (TRUE (2022) - Highly Recommended Addition) : https://arxiv.org/abs/2204.04991
+---related:
+-comprehensive survey and assessment of factual consistency  metrics/tasks/datasets
+-BLEU, ROUGE and token-level F1 have weak correlation with factual consistency
+-very good summary of BERTScore, BLEURT, FactCC, BARTScore, CTC, 
+
+method:
+-Input Length. As QA and NLI models may struggle with long inputs (Kociský et al. ˇ , 2018;Pang et al., 2021; Yin et al., 2021; Shaham et al., --> benchmarked this and results included (consistent -degradation with text longer than 200 tokens for all metrics)
+-bigger models allow for better factual consistency evaluation metrics
+-QG-QA based metrics: quetions generated for spans in the text, questions answered using QA model, compare original span with the answer
+- Q^2: NLI model grounding text = answer, generated text = hypothesis, F1 token overlap instead of exact matching
+-very good comparison of performance of methods
+-NLI and QG_QA basd metrics are complementary (averaging Q^2, ANLI and SCzs scores) --> best metric overall, can be used as unified metric --> ensemble works best
+-works for abstractive summarization, knowledge grounded dialogue, fact verification and paraphrasing
+
+
+MNLI - only dataset paper
+
+FEVER: https://aclanthology.org/N18-1074/
+-sentence selection method - TF-IDF ranking            !!!TODO maybe add this to my methods
+-for entailment:
+    -simple MLP (single hidden layer) - uses TF-IDF cosine similarity
+    -decomposable attention (DA) model (performs) 
+-for evaluation:
+    -correctness: F1 score comparig the human annoted and generated sentences
+
+
+Attribution, Citation, and Quotation: A Survey of Evidence-based Text Generation with Large Language Model: https://arxiv.org/pdf/2508.15396
+Attributed Question Answering (AQA) - 
+
+
+
+
+
+AlignScore
+-relies on AIS
+
+NLI but no really relevant
+--------------------------
+With a Little Push: Adapting NLI for Faithfulness Prediction
+-lightweight NLI models achieves state of the art on TRUE benchmark --> so no expensive models are needed there
+
+MiniCheck (not relevant) - only does efficient/ low cost evaluation compared to high cost 
+
+Auto-GDA (Automatic Generative Domain Adaptation) - better domain adaption and efficiency
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+LLM as a judge
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+RAGAS : https://arxiv.org/pdf/2309.15217
+---related
+-dimensions of evaluation:
+    -identify releavant and focused passages
+    -exploit passages in a faithful way
+    -quality of the generation itself
+-->ragas suite of metircs to evaluate these dimensions without having to rely on human annotation
+-mentions: knowledge cutoff, hard to memorize for models what is rarely mentioned
+            Estimating faithfulness using LLMs The problem of detecting hallucinations in LLM generated
+            responses has been extensively studied (Ji et al.,
+            2023). Several authors have suggested the idea
+            of predicting factuality using a few-shot prompting strategy (Zhang et al., 2023). Recent analyses, however, suggest that existing models struggle
+            with detecting hallucination when using standard
+            prompting strategies (Li et al., 2023; Azaria and
+            Mitchell, 2023). Other approaches rely on linking
+            the generated responses to facts from an external
+            knowledge base (Min et al., 2023), but this is not
+            always possible.
+-BARTscore: estimates factuality by looking at conditional probability of generated text given the input
+-Azaria and Mitchell (2023) propose to train a supervised classifier on the weights from one of the hidden layers
+    -unsuitable for proprietary LLM
+-SelfCheckGPT: sample multiple answers, Annahme: correct ones are more stable
+-Wang et al: 0 and 100 scale / 5-start scale ask ChatGPT to evaluate a particular aspect of a given answer (very good results)
+-most evaluation relies on ground truth answer (BERTScore, moverscore) contextualized embeddings to compare similarity generated and ground truth answer, BART-score (!DIFFERNT) uses similary references to get precision and recall
+---method
+-1. Faithfulness: answer grounded in context, no hallucination, justification
+    -claims made can be inferred from the context
+    -extract set of statements (given questions and answer), for each statement yes / no (Anteil yes ist finale faithfullness score)
+-2. answer relevance: answer adresses question
+    - penalises incomplete, redundant
+    -generate questions for the answer, take embeddings of these questions, calculate similary with original question (cos) (final score average)
+-3. context relevance: context focused, containing as little irrelevant information as possible  (LLMs bad with long texts)
+    - penalizes redundancy
+    - extract sentences that are relevant (number extracted / number sentences in answer)
+
+-benchmarked against GPTScore (ask chat gpt for score 1-10) and GPT ranking (select preferred answer) (MUCH BETTER than that)
+--> RAGAS closely aligned with human judgements (especially faithfulness and relevance)
+-->explain how this judgement evolved from Is ChatGPT a good NLG evaluator? (highly sensitive), to the current one  
+-->FactScore inspires the faithfulness metric
+
+
+
+GVAL: https://arxiv.org/pdf/2303.16634
+---related
+-ngram based: measuring lexical overlap  
+    -BLEUE - geometric mean of modified n-gram precision an brevity
+    - ROUGE: recall oriente for summarization
+-over 60% of papers on NLG only rely on ROUGE or BLEU for system evaluation
+    However, these metrics fail to measure content quality (Reiter and Belz, 2009) or capture syntactic errors (Stent et al., 2005), and therefore do not reflect the reliability of NLG systems accurately.
+-embedding based metrics: semantic similarity between generated and reference text  or their embeddings (WMD, BERTScore, MoverScore)
+-unified evalutaors: by varying input and output contexnts  (UniEval can evaluate as QA Task)
+-LLM based (GPTScore, )
+
+---method
+-BLEU, ROUGE low correlation with human judgement in NLG 
+-chain of thought and form filling paradigm to assess NLG (for text summarization and dialogue generation)
+- as BLEU (Papineni et al., 2002), ROUGE (Lin, 2004), and METEOR (Banerjee and Lavie, 2005) widely used, but low correlation and requireassociated reference outputs
+-1. prompt that contains the definitions of the evaluation task
+-2. CoT set of intermediate instructions generated by the LLM 
+-3. scoring function that calculates score based on propabilitis of return tokens
+    -use propability of output scores and weighted average
+-->baseline against bartscore, moverscore, bertscore, gptscore, ...
+
+summarization result:
+    We adopt the sae approach as Zhong et al. (2022) to evaluate different summarization metrics using summary-level Spearman and Kendall-Tau correlation. The first part of Table 1 shows the results of metrics that compare the semantic similarity between the model output and the reference text. These metrics perform poorly on most dimensions.
+    The second part shows the results of metrics that use neural networks to learn from human ratings of summary quality. These metrics have much higher correlations than the similarity-based metrics, suggesting that they 
+    -->G EVAL outperforms all on the SummEval benchmark 
+effect of CoT: higher correlation than without
+effect of model size: larger modely improves the evaluation, especially for more complex tasks
+
+
+
+ARES: https://arxiv.org/abs/2311.09476
+-evaluate RAG along 
+    -conext relevance (retrieved info relevant), 
+    -answer faithfulness (response properly grounded) 
+    -answer relevance (response relevant to the question)
+-generate tailored LLM judges for each component of a RAG pipeline, provides confidence intervals
+-require: in domain passage set, 150 annotated datapoints, few-shot examples of in domains queries
+-constructs syntactic dataset using LM, define three separate judge models for classification tasks (context relevance, faith...), PPI (Prediction powered inference to provide confidence intervals) 
+-related work very good RAG description
+-early tries: MT-Bench and Chatbot Arena, 
+-Auto Calibrate (LLM judge)
+maybe look at LongEval
+---method:
+-synthethic generation:
+    -input set of few shot examples with given in-domain passage to generate synthetic question and answer
+    -filter low -quality queries by testing if a given query can retrieve its original passage as top result using its retriever (cites other paper as well)
+-llm judges
+    -finetune model using synthethic data
+    -binary classifier
+-juding:
+    -average across all metric
+--> crushes RAGAS, with PPI even provides statistical guarantees
+---------------
+
+
+
+FactScore: https://arxiv.org/abs/2305.14251
+Evaluating the factuality of long-form text generated by large language models (LMs) is nontrivial because (1) generations often contain a mixture of supported and unsupported pieces of information, making binary judgments of quality inadequate, and (2) human evaluation is time-consuming and costly.
+-break into facts (because sentences are a mix of supported/unsupported facts) --> assing binary label to each of them
+    -Every atomic fact in Ay has an equal weight of importance, following Krishna et al. (2023).
+
+
+
+Chain-of-Thought Prompting elicits Reasoning in Large language models: https://arxiv.org/abs/2201.11903
+-cot improves complex reasonings by decomposing into simpler partial steps, just as human thinking does
+-more computation (split up), window into behaviour of the model (since reasoning), 
+-only relevant for large models (no improvement, worsening for <100B parameters)
+-more improvements for more complex problems
+-reaches state of the art level for 175B gpt3 and 540B PaLM
+
+
+
+
+GPTScore: Evaluate as You Desire: https://arxiv.org/abs/2302.04166
+-scores conditional token propability of the genereated text ("if LLM forced to output this, how confident is it in it")
+--> higher probability of that output --> higher score
+-beaten by geval?
+
+
+
+
+Automatic Evaluation of Attribution by Large Language Models : https://aclanthology.org/2023.findings-emnlp.307.pdf
+attribution split into 3 categories: (--> not just binary, but understand what exact attribution error)
+    -attributable: reference fully supports generated statement
+    -extrapolatory: reference lacks sufficient information to support generated statement
+    -contradictory: statement directly contradicts the cited reference
+-also uses zero shot llm (and also fine tuned llm)
+LEARNINGS
+-small models (7-13B parameters) are terrible at one shot judgements
+-adopt attribution split
+
+
+Juding LLM-as-a-Judge with MT-Bench: https://arxiv.org/abs/2306.05685
+-ROUGE, BLEU not suited for open-ended without reference answer
+-LLM as a judge:
+    -advantages: scalability, explainability
+    -limitations: 
+        - position bias (favoring first or second option)
+        - verbosity bias: favoring longer answers
+        - self enhancement bias (favoring own answers)
+        - limited math/ reasoning capabilities
+- human judgement is gold standard, but the LLM shows very close alignment with human judgement (same as agreement between 2 different human raters)
+
+
+
+CiteEval: Principle-Driven Citation Evaluation for Source Attribution: https://aclanthology.org/2025.acl-long.1574.pdf
+3 principles:
+    -evalualte citation against full sources, not only against the retrieved passages
+        -look for better potential quote
+    -evaluate citations beyond retrieval context 
+    -evaluate with fine grained criteria (instead of binary)
+-away from binary, point out precisely whats wrong
+-penalty for long answer
+-LEARNING: much more connected judgement over sentences, i should point this out as a weakness of my system
+
+
+
+
+AttributionBench: How Hard is Automatic Attribution Evaluation?: https://aclanthology.org/2024.findings-acl.886.pdf
+-tested adding the question and full answer to judgement context --> barely improving/ sometimes worse
+-heavy prompt engineering (step-by-step, chain-of-thought, hyper strict) barely improves
+-fine grained information sensitivity (over 66% happended because of overlooking names, numbers, hallucinating connection)
+-extracting quotes inherently introduces prob ability of losing context
+-->LLMs currently struggle as judges (cite this paper) --> hard metrics could cover those weaknesses
+LEARNING:
+-think again about what models to use for judgemnt
+
+
+
+
+todo
+-maybe mention that i only look at post hoc
+

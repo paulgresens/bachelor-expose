@@ -1,0 +1,20 @@
+\chapter{Methodology and Approach}
+\label{cha:MethodologyAndApproach}
+\section{Dataset}
+In order to curate a dataset of high quality open domain scientific questions, meeting previously discussed criteria, I will apply an automated pipeline. In order to guarantee domain alignment of the questions, this pipeline will only rely on papers that are also part of the unArXive2024 Dataset. In order to ensure a wide variety of topics across the dataset, papers will be chosen randomly across the dataset. Closely mimicking how the process of answering complex scientific questions usually works, with information scattered across numerous sources, the goal of this pipeline is to generate multihop questions, requiring at best complex reasoning capability as well as multiple sources to reliably and correctly answer. In order to achieve that, not only the chosen paper, but also some of its citations, will be used as a basis for question generation. Using this method I aim to produce a dataset with a size of approximately 500 questions, while also collecting additional metadata to later use for further evaluation.
+
+\section{Cited text span extraction}
+Developing a system capable of providing cited text spans alongside its answer introduces an additional constraint in terms of run-time performance, balancing the computation complexity of the retrieval process against potential improvements in retrieved citations. While specific requirements do heavily rely on the domain of application, I want to benchmark a spectrum of different retrieval approaches in terms of correctness and efficiency.
+%sowas wie spektrum von dem man wählen kann dunno
+
+Starting with the existing SQuAI extraction method relying on lexical matching, I will further introduce semantic retrieval using Bi-Encoders as well as reasoning capabilities in the form of Cross-Encoders and strategic combinations of those methods to try to further enhance the system's performance. As a gold standard I will additionally use an LLM, applying its deep reading comprehension and reasoning capabilities.
+
+
+\section{Span evaluation}
+While the main focus of this work is the improvement of the more promising post-hoc attribution of source spans, I will also aim for a comprehensive evaluation of the system as a whole, since post-hoc methods are dependent on the results of prior execution steps. Therefore further improvements of the span extraction should also be sought there. The evaluation is thus split up into the following parts: 
+\begin{enumerate}
+\item Evaluation of factual correctness of the generated answers, leveraging the ground truth answer provided via the dataset.
+\item Evaluating the retrieval capabilities of the SQuAI system using metrics like precision, recall, F1-Score
+\item Evaluating the performance and latency of extraction variants
+\item Evaluating how suitable the extracted spans are as justification for their respective sentence. This will include using a NLI model to check for logical entailment as well as an LLM-as-a-judge approach measuring metrics like faithfulness, contextual relevance, logical consistency and ambiguity of the attributed text spans.
+\end{enumerate}

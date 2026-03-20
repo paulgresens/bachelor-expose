@@ -1,0 +1,142 @@
+papers that i look at at related work dataset curation, that also do some citation thingies:
+
+Paper -2: ALCE benchmark
+only 2 post hoc methods:
+    - sample 4 best responses, rerank  using automatic citation recall score (defined in this paper, based on entailment rating by NLI)
+    - from top 100 passages use dense retriever to find best one
+
+Paper -1: qasper (pre hoc approach - so not relevant)
+-every paragraph gets <s> token, , decide with binary classification if paragraph relevant or not
+
+Paper 0: qasa - only pre hoc
+--------------------------------------------------------------------------------------------
+
+Tobias Vorschläge:
+LaQuer
+- user highlights specific part of text --> system returns precise span that supports it
+- 2 methods for finding the supporting spans:
+    - aks LLM to extract text span
+    - use hidden internal states/ weights of the model to find the supporting text span
+
+
+Paper 1: On Synthesizing Data for Context Attribution in Question Answering
+    - https://arxiv.org/pdf/2504.05317
+    - also just LLM based post hoc
+
+Paper 2: Where Did That Come From?
+https://aclanthology.org/2025.findings-emnlp.339.pdf
+    -same also LLM based
+
+Paper 3: Context Based Quotation Recommendation
+    -https://arxiv.org/pdf/2005.08319
+    -also just LLM based (first paragraph, then exact quote)
+
+Paper 4: Cited Text Spans for Scientific Citation Text Generation
+    -https://arxiv.org/pdf/2309.06365v2
+    - uses Auto-AIS Score, nothing else beneficial
+
+Paper 5: Generation-Time vs Post-hoc Citation (Holistic Evaluation of LLM Attribution)
+    - https://arxiv.org/pdf/2509.21557
+    post hoc citations higher quality than generation time citations (lower hallucination, higher trustworthiness)
+    -RAG way better than zero shot LLM (primary driver, biggest performance jump)
+    -uses biencoder then cross encoder reranker (just as i do)
+
+Paper 6:
+    - https://arxiv.org/pdf/2112.12870
+    - answer sentence must be decontextualized (so maybe add preprocessing before trying to find the quote?)
+    - 
+
+
+
+OTHER METHODS TRYING TO ACHIEVE THE SAME THING BUT DIFFERENT METHOD
+
+GENERATIVE APPROACH:
+    Paper 7: GERE: Generative Evidence Retrieval for Fact Verification
+        - https://arxiv.org/pdf/2204.05511
+        - evidence retrieval as generative task
+        - pick sentences from a set (based on generated evidence sentence identifiers (their semantic representation))
+
+        "While dense retrieval methods dominate the field, recent work has explored generative alternatives. For instance, Chen et al. (2022) introduced GERE, a framework that treats evidence retrieval as a sequence-to-sequence task. By autoregressively generating document titles and specific sentence identifiers, GERE avoids the computational cost of large-scale indexing while effectively modeling dependencies between multiple pieces of evidence."
+
+
+    MRR-FV: Multi-hop Retrieval and Reasoning for Fact Verification (2025)
+    -https://ojs.aaai.org/index.php/AAAI/article/view/34802
+    - heavy multi hop reasoning across multiple documents
+
+    3. SEAL: Search Engine As Language Model (2022)
+    -https://arxiv.org/pdf/2204.10628
+    - 
+
+
+    4. BootRet: Bootstrapped Pre-training for Generative Retrieval (2024)
+
+WHITE BOX MECHANISMS:
+    Paper 8: Grains:  (dont mention not relevant for precise extraction of text spans)
+        - https://arxiv.org/pdf/2507.18043
+        -  gradient-based attribution methods like GRAINS (integrated Gradients to calculate causal influence of specific tokens, which ones drive to unwanted/desired output --> identifies root context)
+        - requires white-box model access
+
+
+    Paper 9: LaQuer:
+        - https://aclanthology.org/2025.acl-long.746.pdf
+        - user can highliht spans
+            -spans get decontextualized
+            - use LLM internals (analyzing hidden states) (cross attention weights)
+        - LLM prompting outperforms internals
+        -also states 
+        -->highly dependent on preprocessing since the user hightlihgts potentially uncontextualized spans
+
+    for 8 and 9:
+    For instance, LaQuer maps generated text to source spans by analyzing internal cross-attention weights to see where the model was "looking." Similarly, gradient-based attribution methods like GRAINS utilize Integrated Gradients to calculate the causal influence of specific input tokens, identifying exactly which parts of the context drove the model's output. While highly precise for token-level attribution and internal steering, these methods require full open-source access to the underlying model architecture, hidden layers, and gradients, rendering them incompatible with proprietary LLMs. To maintain flexibility and model-agnosticism, this thesis focuses entirely on black-box, retrieval-based extraction pipelines.
+
+
+Token Embeddings (Phukan et al.,2024) (functions exactly the same as laquer, but without interactivity)
+AttnAttribute (Basu et al., 2025): https://arxiv.org/pdf/2502.08059
+
+
+REASONING AND DECOMPOSITION: (could mention this as a paper where its treated as a reasoning problems)
+    Paper 10: Decomposition Enhanced Training
+    - https://arxiv.org/pdf/2510.25766
+    - breaks answers into units, attributes context to those units
+    - mention for further improvements
+    - deocntextualizes answer / breaks down into simple fact, then ALSO JUST ASKS AN LLM
+
+    How to write it: "While recent works like DECOMPTUNE argue that post-hoc attribution should be reframed as a reasoning task requiring answer decomposition, this thesis focuses on the performance of the underlying retrieval architectures themselves. By isolating the retrieval component, we can benchmark the effectiveness of different embedding and ranking strategies independently of complex multi-step reasoning chains."
+
+
+JUSTIFICTION FOR METHODS
+################################
+bi encoder for semantic search: https://aclanthology.org/2022.aacl-main.41.pdf justifies using them
+justification for window size:
+    -https://www.cs.odu.edu/~jwu/downloads/pubs/guo-2020-wosp/guo-2020-wosp.pdf
+    - inverse qa paper
+
+CAICSIT: Citation Context Extraction Using a Transformer-Based Model with a Question-Answering Task
+https://www.researchgate.net/publication/394691275_Citation_Context_Extraction_Using_a_Transformer-Based_Model_with_a_Question-Answering_Task
+
+METHODS TO MENTION (Related work)
+#############################################################################
+Method 9: Graph-Based (Skip / Related Work)
+-Temporal Relation Extraction in Clinical Texts: A Span-based Graph Transformer Approach (GRAPHTREX)" (ACL Anthology, 2025)
+
+METHODS MAYBE 
+#############################################################################
+Shapely Value based on that paper (run on small model to see how much each sentence influences)
+-Source Attribution in Retrieval-Augmented Generation
+
+
+METHODS THAT I SHOULD ADD:
+#############################################################################
+based on this paper: https://www.researchgate.net/publication/394691275_Citation_Context_Extraction_Using_a_Transformer-Based_Model_with_a_Question-Answering_Task
+-INVERSE QA - extractive pointer, so that models only outputs start and end index in the text (maybe take smaller LLM modell)
+-very good related work section - take justification info from here (window size, ...)
+    - fixed context size bad, their fine tuned roberta model outperforms that
+- use this as justification for the decontextualization step before: https://aclanthology.org/2023.wiesp-1.16.pdf
+
+
+
+
+
+
+TODO PRACTICAL CHANGES ON THE SETUP
+-cutoff threshold when not to assign a citation (if to bad) ? 

@@ -1,5 +1,15 @@
 - look for notes in existing sections + these ones:
 
+FORCING JSON OUTPUT:
+-https://arxiv.org/pdf/2408.02442
+    -says that its bad
+
+
+TODOs
+-change title
+
+
+
 
 evaluation:
 ALCE benchark does also do a lot of evaluation (look related work - partially analysed paper)
@@ -7,4 +17,45 @@ ALCE benchark does also do a lot of evaluation (look related work - partially an
     -also measures correctness
 
 
+wie ähnlich qwen fragengenerierung zu bewertung mistral
+fragen fangen alle mit "How" an
+
+
+
 -show why post hoc is good
+
+
+for judgement: methods:
+-correctness (maybe BERT and LLM judging?)
+-latency
+
+-precision
+-recall 
+-f1
+
+-NLI entailment
+-LLM as a judged
+
+
+andere quelle als arxiv als primärquelle (falls woanders gepublished)
+
+
+
+example for context attribution:
+How do character and subword models, when integrated with deep learning techniques, improve the detection of abusive language in social media, and what are the key factors contributing to their effectiveness?
+How can the integration of privileged information and domain adaptation techniques enhance the performance of object recognition tasks, particularly in scenarios where labeled data is limited?
+
+The integration of privileged information and domain adaptation techniques can significantly enhance the performance of object recognition tasks, especially in scenarios with limited labeled data. Privileged information, such as additional features or annotations available only during training, can provide the model with more context and help it learn more robust representations. Domain adaptation, on the other hand, allows the model to leverage knowledge from a source domain with abundant labeled data to improve performance in a target domain with limited labeled data. By combining these approaches, the model can benefit from both the additional context provided by privileged information and the transfer of knowledge from a well-labeled source domain. This combination can lead to better generalization and improved performance, even when the target domain has limited labeled data. For instance, in the context of object recognition, using privileged information like bounding box annotations or semantic attributes, and adapting the model from a well-labeled RGB image dataset to a less labeled depth image dataset, can result in significant performance gains.
+
+--add 
+-decontextualization of answr sentences before (metric to measure decontextualizetion maybe) trying to add context
+
+
+
+maybe TODOs
+- maybe add decontextualization step before judging or even before extraction?
+-maybe split evaluation into 1 LLM request per metric? and use smaller models?
+
+
+-questions for tobias:
+-should i add methods?
