@@ -1,10 +1,10 @@
-% !TeX root = thesis.tex
+% !TeX root = expose.tex
 % Meta-Informationen -------------------------------------------------------
 %		Informationen über das Dokument, wie z.B. Titel, Autor, Matrikelnr. etc
 %		werden in der Datei _Meta.tex definiert und können danach global
 %		verwendet werden.
 % --------------------------------------------------------------------------
-\input{_Meta}
+\input{_MetaExpose}
 
 % Dokumentenkopf -----------------------------------------------------------
 % 	Diese Vorlage basiert auf "scrreprt" aus dem koma-script.
@@ -37,19 +37,13 @@
 
 % Erstellung eines Index und Abkürzungsverzeichnisses aktivieren -----------
 \makeindex
-% makeindex thesis.nlo -s nomencl.ist -o thesis.nls
+% makeindex expose.nlo -s nomencl.ist -o expose.nls
 \makenomenclature
 
 
 % Kopf- und Fußzeilen, Seitenränder etc. -----------------------------------
 \input{Seitenstil}
-
-% Eigene Definitionen für Silbentrennung
-\include{Silbentrennung}
-% Das eigentliche Dokument -------------------------------------------------
-%		Der eigentliche Inhalt des Dokuments beginnt hier. Die einzelnen Seiten
-%		und Kapitel werden in eigene Dateien ausgelagert und hier nur inkludiert.
-% --------------------------------------------------------------------------
+\hyphenation{Trenn-bar-es}
 
 \begin{document}
 % auch subsubsection nummerieren
@@ -94,12 +88,15 @@
 %		in den entsprechenden .TEX-Dateien vorliegen. Die Dateinamen können
 % 		natürlich angepasst werden.
 % --------------------------------------------------------------------------
-\include{Inhalt/Introduction}
-\include{Inhalt/RelatedWork}
+\include{Inhalt/ExposeIntroduction}
+\include{Inhalt/ExposeRelatedWork}
+\include{Inhalt/ExposeMethodologyAndApproach}
+\include{Inhalt/ExposeTimetable}
 
-\include{Inhalt/MethodologyAndApproach}
 
-\include{Inhalt/Evaluation}
+
+% \include{Inhalt/MethodologyAndApproach}
+% \include{Inhalt/ScheduleAndState}
 
 %\include{Inhalt/Grundlagen...}
 
@@ -124,7 +121,7 @@
 \clearpage
 \renewcommand*{\thesection}{\Alph{section}} 
 \pagenumbering{Roman}
-\include{Inhalt/Appendix}
+%\include{Inhalt/Anhang}
 
 
 

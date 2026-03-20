@@ -1,0 +1,61 @@
+\chapter{Appendix}
+\label{cha:Appendix}
+
+\begin{lstlisting}[caption={Question–Answer generation prompt}, label={lst:questionAnswerGenerationPrompt}]
+You will be be provided 5 scientific paper text, which share same topic that they are talking about. They will be provided in the following format:
+[
+  {
+    "ArXiv": string,
+    "text": string,
+  }
+]
+
+You should do the following:
+Step 1: Read the given scientific paper texts and extract a list of 10 topics where the papers overlap, contract or complement each other. Focus on important concepts or entities within the papers. Avoid using generic or broad words.
+Step 2: Use the Topics from Step 1 to generate 1 scientific question-answer pair, with the following requirements.
+Requirements:
+-question should be based on the information provided in multiple of the papers
+-try generating a questions, that requires multiple papers to answer
+-question must be context independently answerable, so no reference to a specific paper or entities that you can only understand with the specific paper. The question should have the same character, as if you would ask an scientific expert in their field something, without having a specific paper in mind. Do not refer to external sources like figures or tables.
+-question cannot contain explicit references to the papers or its content such as "in this paper", "the proposed methods" or similar
+-prioritize a question that requires synthesizing, resolving, applying, or evaluating information across papers
+-question should be a complex scientific question that needs in depth knowledge in that area, avoid just asking a simple or definitional question
+-try answering the question as specific as possible
+-add the arxiv ids of the papers, that contain the relevant information for answering the question
+-only add the arxiv id of the paper if it really did contribute significantly to the answer of the question
+
+provide your answer, stricly following this json format:
+{
+    "topic overlaps" : [
+    <TOPIC OVERLAP 1>,
+    <TOPIC OVERLAP 2>,
+    ...
+    ],
+    "question": "<YOUR_QUESTION>",
+    "answer": "<YOUR ANSWER>",
+    "usageJudgementGeneratorLLM":[<ARXIV_ID_1>, <ARXIV_ID_2>, ...]  
+}
+Do not deviate from this schema. Dont add the keywords you generated. Do not add any preciding information like ```json. Only Answer with the valid json
+Paper Texts: {paperTexts}
+\end{lstlisting}
+
+
+\begin{lstlisting}[caption={paper usage judgement prompt}, label={lst:usageJudgementPrompt}]
+You will be provided a scientific question, an answer, and a scientific paper text. 
+Your task is to evaluate whether the specific information in the scientific paper text is necessary to answer the question.
+
+Step 1: Read the question and the synthesized answer. Identify the core scientific claims being made.
+Step 2: Scan the scientific paper text. 
+Step 3: Determine if the paper provides explicit evidence, data, or mechanisms that directly support the answer. Do not accept mere keyword overlap.
+
+Output your final verdict inside <verdict> tags. The verdict must be exactly "true" or "false".
+
+Output Example:
+    <Your thinking process described in step 1-3 here>
+    <verdict>true</verdict>
+
+question: {question}
+answer: {answer}
+scientific paper text: {scientificPaperText} 
+\end{lstlisting}
+

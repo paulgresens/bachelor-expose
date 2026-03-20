@@ -50,15 +50,24 @@
       url={https://arxiv.org/abs/2407.09413}, 
 }
 
-@misc{qasa,
-      title={QASA: Quality-Guided K-Adaptive Slot Attention for Unsupervised Object-Centric Learning}, 
-      author={Tianran Ouyang and Xingping Dong and Jing Zhang and Mang Ye and Jun Chen and Bo Du},
-      year={2026},
-      eprint={2601.12936},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV},
-      url={https://arxiv.org/abs/2601.12936}, 
+
+
+@InProceedings{qasa,
+  title = 	 {{QASA}: Advanced Question Answering on Scientific Articles},
+  author =       {Lee, Yoonjoo and Lee, Kyungjae and Park, Sunghyun and Hwang, Dasol and Kim, Jaehyeon and Lee, Hong-In and Lee, Moontae},
+  booktitle = 	 {Proceedings of the 40th International Conference on Machine Learning},
+  pages = 	 {19036--19052},
+  year = 	 {2023},
+  editor = 	 {Krause, Andreas and Brunskill, Emma and Cho, Kyunghyun and Engelhardt, Barbara and Sabato, Sivan and Scarlett, Jonathan},
+  volume = 	 {202},
+  series = 	 {Proceedings of Machine Learning Research},
+  month = 	 {7},
+  publisher =    {PMLR},
+  pdf = 	 {https://proceedings.mlr.press/v202/lee23n/lee23n.pdf},
+  url = 	 {https://proceedings.mlr.press/v202/lee23n.html},
+  abstract = 	 {Reasoning is the crux of intellectual thinking. While question answering (QA) tasks are prolific with various computational models and benchmark datasets, they mostly tackle factoid or shallow QA without asking deeper understanding. Dual process theory asserts that human reasoning consists of associative thinking to collect relevant pieces of knowledge and logical reasoning to consciously conclude grounding on evidential rationale. Based on our intensive think-aloud study that revealed the three types of questions: surface, testing, and deep questions, we first propose the QASA benchmark that consists of 1798 novel question answering pairs that require full-stack reasoning on scientific articles in AI and ML fields. Then we propose the QASA approach that tackles the full-stack reasoning with large language models via associative selection, evidential rationale-generation, and systematic composition. Our experimental results show that QASA’s full-stack inference outperforms the state-of-the-art InstructGPT by a big margin. We also find that rationale-generation is critical for the performance gain, claiming how we should rethink advanced question answering. The dataset is available at https://github.com/lgresearch/QASA.}
 }
+
 
 @misc{expertQA,
       title={ExpertQA: Expert-Curated Questions and Attributed Answers}, 
@@ -97,3 +106,485 @@
       primaryClass={cs.CL},
       url={https://arxiv.org/abs/2502.13668}, 
 }
+
+@misc{generationTimeVsPostHocCitation,
+      title={Generation-Time vs. Post-hoc Citation: A Holistic Evaluation of LLM Attribution}, 
+      author={Yash Saxena and Raviteja Bommireddy and Ankur Padia and Manas Gaur},
+      year={2025},
+      eprint={2509.21557},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2509.21557}, 
+}
+@misc{onSynthesizingDataForContextAttributionInQuestionAnswering,
+      title={On Synthesizing Data for Context Attribution in Question Answering}, 
+      author={Gorjan Radevski and Kiril Gashteovski and Shahbaz Syed and Christopher Malon and Sebastien Nicolas and Chia-Chien Hung and Timo Sztyler and Verena Heußer and Wiem Ben Rim and Masafumi Enomoto and Kunihiro Takeoka and Masafumi Oyamada and Goran Glavaš and Carolin Lawrence},
+      year={2025},
+      eprint={2504.05317},
+      archivePrefix={arXiv},
+      primaryClass={cs.IR},
+      url={https://arxiv.org/abs/2504.05317}, 
+}
+@inproceedings{whereDidThatComeFrom,
+    title = "Where Did That Come From? Sentence-Level Error-Tolerant Attribution",
+    author = "Ernst, Ori  and
+      Slobodkin, Aviv  and
+      Cao, Meng  and
+      Wei, Sihui  and
+      Cheung, Jackie CK",
+    editor = "Christodoulopoulos, Christos  and
+      Chakraborty, Tanmoy  and
+      Rose, Carolyn  and
+      Peng, Violet",
+    booktitle = "Findings of the Association for Computational Linguistics: EMNLP 2025",
+    month = nov,
+    year = "2025",
+    address = "Suzhou, China",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.findings-emnlp.339/",
+    doi = "10.18653/v1/2025.findings-emnlp.339",
+    pages = "6400--6417",
+    ISBN = "979-8-89176-335-7",
+    abstract = "Attribution is the process of identifying which parts of the source support a generated output. While attribution can help users verify content and assess faithfulness, existing task definitions typically exclude unsupported or hallucinated content leaving them unattributed, overlooking the potential to increase faithfulness certainty, locate the error, and fix it easier.In this paper, we propose a new definition for sentence-level error-tolerant attribution, which extends attribution to include incorrect or hallucinated content. We introduce a benchmark for this task and evaluate a range of models on it. Our results show that sentence-level error-tolerant attribution improves the quality of both automatic and manual faithfulness evaluations, reducing annotation time by 30{\%} in long-document settings, and facilitates hallucination fixing. We also find that unfaithful outputs are often linked to sentences that appear later in the source or contain non-literal language, pointing to promising avenues for hallucination mitigation. Our approach offers a better user experience along with improved faithfulness evaluation, with better understanding of model behavior."
+}
+
+@misc{ContextBasedQuotationRecommendation,
+      title={Context-Based Quotation Recommendation}, 
+      author={Ansel MacLaughlin and Tao Chen and Burcu Karagol Ayan and Dan Roth},
+      year={2020},
+      eprint={2005.08319},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2005.08319}, 
+}
+
+@misc{laquer,
+      title={LAQuer: Localized Attribution Queries in Content-grounded Generation}, 
+      author={Eran Hirsch and Aviv Slobodkin and David Wan and Elias Stengel-Eskin and Mohit Bansal and Ido Dagan},
+      year={2025},
+      eprint={2506.01187},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2506.01187}, 
+}
+@misc{GrAInS,
+      title={GrAInS: Gradient-based Attribution for Inference-Time Steering of LLMs and VLMs}, 
+      author={Duy Nguyen and Archiki Prasad and Elias Stengel-Eskin and Mohit Bansal},
+      year={2025},
+      eprint={2507.18043},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2507.18043}, 
+}
+
+@misc{decompositionEnhancedTraining,
+      title={Decomposition-Enhanced Training for Post-Hoc Attributions In Language Models}, 
+      author={Sriram Balasubramanian and Samyadeep Basu and Koustava Goswami and Ryan Rossi and Varun Manjunatha and Roshan Santhosh and Ruiyi Zhang and Soheil Feizi and Nedim Lipka},
+      year={2025},
+      eprint={2510.25766},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2510.25766}, 
+}
+
+@misc{autoregressiveSeachEnginesSeal,
+      title={Autoregressive Search Engines: Generating Substrings as Document Identifiers}, 
+      author={Michele Bevilacqua and Giuseppe Ottaviano and Patrick Lewis and Wen-tau Yih and Sebastian Riedel and Fabio Petroni},
+      year={2022},
+      eprint={2204.10628},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2204.10628}, 
+}
+@inproceedings{generativeEvidenceRetrievalForFactVerification, 
+series={SIGIR ’22},
+   title={GERE: Generative Evidence Retrieval for Fact Verification},
+   url={http://dx.doi.org/10.1145/3477495.3531827},
+   DOI={10.1145/3477495.3531827},
+   booktitle={Proceedings of the 45th International ACM SIGIR Conference on Research and Development in Information Retrieval},
+   publisher={ACM},
+   author={Chen, Jiangui and Zhang, Ruqing and Guo, Jiafeng and Fan, Yixing and Cheng, Xueqi},
+   year={2022},
+   month=jul, pages={2184–2189},
+   collection={SIGIR ’22} }
+
+
+@article{mrr-fv, 
+title={MRR-FV: Unlocking Complex Fact Verification with Multi-Hop Retrieval and Reasoning}, 
+volume={39}, url={https://ojs.aaai.org/index.php/AAAI/article/view/34802}, 
+DOI={10.1609/aaai.v39i24.34802}, 
+abstractNote={The pervasive spread of misinformation on social networks highlights the critical necessity for effective fact verification systems. Traditional approaches primarily focus on pairwise correlations between claims and evidence, often neglecting comprehensive multi-hop retrieval and reasoning, which results in suboptimal performance when dealing with complex claims. In this paper, we propose MRR-FV, a generative retrieval-enhanced model designed to address the novel challenge of Multi-hop Retrieval and Reasoning for Fact Verification, which integrates two core modules: Generative Multi-hop Retriever and the Hierarchical Interaction Reasoner. MRR-FV utilizes an autoregressive model for iterative multi-hop evidence retrieval, complemented by a pre-trained compressor to address the challenge of intention shift across retrieval hops. For claim verification, we propose a hierarchical interaction reasoner that conducts intra-sentence reasoning to capture long-term semantic dependencies and inter-sentence reasoning across multi-hop evidence subgraphs to reveal complex evidence interactions. Experimental evaluations on the FEVER and HOVER datasets demonstrate the superior performance of our model in both claim verification and evidence retrieval tasks.}, 
+number={24}, 
+journal={Proceedings of the AAAI Conference on Artificial Intelligence}, 
+author={Zheng, Liwen and Li, Chaozhuo and Zhang, Litian and Jia, Haoran and Wang, Senzhang and Liu, Zheng and Zhang, Xi}, 
+year={2025}, 
+month={4}, 
+pages={26066-26074} }
+
+@misc{onMechanisticCircuitsForExtractiveQuestions,
+      title={On Mechanistic Circuits for Extractive Question-Answering}, 
+      author={Samyadeep Basu and Vlad Morariu and Zichao Wang and Ryan Rossi and Cherry Zhao and Soheil Feizi and Varun Manjunatha},
+      year={2025},
+      eprint={2502.08059},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2502.08059}, 
+}
+@misc{peeringIntoTheMindOfLanguageModels,
+      title={Peering into the Mind of Language Models: An Approach for Attribution in Contextual Question Answering}, 
+      author={Anirudh Phukan and Shwetha Somasundaram and Apoorv Saxena and Koustava Goswami and Balaji Vasan Srinivasan},
+      year={2024},
+      eprint={2405.17980},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2405.17980}, 
+}
+@inbook{citationContextExtractionUsingTransformerBasedModel,
+author = {Khanyi, Masana and Lill, Milandre and Dunaiski, Marcel},
+year = {2025},
+month = {07},
+pages = {293-306},
+title = {Citation Context Extraction Using a Transformer-Based Model with a Question-Answering Task},
+isbn = {978-3-031-96261-5},
+doi = {10.1007/978-3-031-96262-2_19}
+}
+
+
+@inbook{citationContextExtractionUsingATransformerBasedModel,
+author = {Khanyi, Masana and Lill, Milandre and Dunaiski, Marcel},
+year = {2025},
+month = {07},
+pages = {293-306},
+title = {Citation Context Extraction Using a Transformer-Based Model with a Question-Answering Task},
+isbn = {978-3-031-96261-5},
+doi = {10.1007/978-3-031-96262-2_19}
+}
+
+@inproceedings{bleu,
+  title={Bleu: a Method for Automatic Evaluation of Machine Translation},
+  author={Kishore Papineni and Salim Roukos and Todd Ward and Wei-Jing Zhu},
+  booktitle={Annual Meeting of the Association for Computational Linguistics},
+  year={2002},
+  url={https://api.semanticscholar.org/CorpusID:11080756}
+}
+
+@inproceedings{rouge,
+    title = "{ROUGE}: A Package for Automatic Evaluation of Summaries",
+    author = "Lin, Chin-Yew",
+    booktitle = "Text Summarization Branches Out",
+    month = jul,
+    year = "2004",
+    address = "Barcelona, Spain",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/W04-1013/",
+    pages = "74--81"
+}
+
+@misc{bartScore,
+      title={BARTScore: Evaluating Generated Text as Text Generation}, 
+      author={Weizhe Yuan and Graham Neubig and Pengfei Liu},
+      year={2021},
+      eprint={2106.11520},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2106.11520}, 
+}
+
+@misc{bertScore,
+      title={BERTScore: Evaluating Text Generation with BERT}, 
+      author={Tianyi Zhang and Varsha Kishore and Felix Wu and Kilian Q. Weinberger and Yoav Artzi},
+      year={2020},
+      eprint={1904.09675},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/1904.09675}, 
+}
+
+@misc{moverScore,
+      title={MoverScore: Text Generation Evaluating with Contextualized Embeddings and Earth Mover Distance}, 
+      author={Wei Zhao and Maxime Peyrard and Fei Liu and Yang Gao and Christian M. Meyer and Steffen Eger},
+      year={2019},
+      eprint={1909.02622},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/1909.02622}, 
+}
+
+
+@misc{measuringAttributionInNaturalLanguageGenerationModels,
+      title={Measuring Attribution in Natural Language Generation Models}, 
+      author={Hannah Rashkin and Vitaly Nikolaev and Matthew Lamm and Lora Aroyo and Michael Collins and Dipanjan Das and Slav Petrov and Gaurav Singh Tomar and Iulia Turc and David Reitter},
+      year={2022},
+      eprint={2112.12870},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2112.12870}, 
+}
+@misc{TRUE,
+      title={TRUE: Re-evaluating Factual Consistency Evaluation}, 
+      author={Or Honovich and Roee Aharoni and Jonathan Herzig and Hagai Taitelbaum and Doron Kukliansy and Vered Cohen and Thomas Scialom and Idan Szpektor and Avinatan Hassidim and Yossi Matias},
+      year={2022},
+      eprint={2204.04991},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2204.04991}, 
+}
+
+@misc{evaluatingFactualConsistencyOfAbstractiveTextSummarization,
+      title={Evaluating the Factual Consistency of Abstractive Text Summarization}, 
+      author={Wojciech Kryściński and Bryan McCann and Caiming Xiong and Richard Socher},
+      year={2019},
+      eprint={1910.12840},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/1910.12840}, 
+}
+
+@inproceedings{citeEvalPrincipleDrivenCitationEvaluationForSourceAttribution,
+    title = "{C}ite{E}val: Principle-Driven Citation Evaluation for Source Attribution",
+    author = "Xu, Yumo  and
+      Qi, Peng  and
+      Chen, Jifan  and
+      Liu, Kunlun  and
+      Han, Rujun  and
+      Liu, Lan  and
+      Min, Bonan  and
+      Castelli, Vittorio  and
+      Gupta, Arshit  and
+      Wang, Zhiguo",
+    editor = "Che, Wanxiang  and
+      Nabende, Joyce  and
+      Shutova, Ekaterina  and
+      Pilehvar, Mohammad Taher",
+    booktitle = "Proceedings of the 63rd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)",
+    month = jul,
+    year = "2025",
+    address = "Vienna, Austria",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.acl-long.1574/",
+    doi = "10.18653/v1/2025.acl-long.1574",
+    pages = "32759--32778",
+    ISBN = "979-8-89176-251-0",
+    abstract = "Citation quality is crucial in information-seeking systems, directly influencing trust and the effectiveness of information access. Current evaluation frameworks, both human and automatic, mainly rely on Natural Language Inference (NLI) to assess binary or ternary supportiveness from cited sources, which we argue is a suboptimal proxy for citation evaluation. In this work we introduce CiteEval, a citation evaluation framework driven by principles focusing on fine-grained citation assessment within a broad context, encompassing not only the cited sources but the full retrieval context, user query, and generated text. Guided by the proposed framework, we construct CiteBench, a multi-domain benchmark with high-quality human annotations on citation quality. To enable efficient evaluation, we further develop CiteEval-Auto, a suite of model-based metrics that exhibit strong correlation with human judgments. Experiments across diverse systems demonstrate CiteEval-Auto{'}s superior ability to capture the multifaceted nature of citations compared to existing metrics, offering a principled and scalable approach to evaluate and improve model-generated citations."
+}
+
+@misc{summaC,
+      title={SummaC: Re-Visiting NLI-based Models for Inconsistency Detection in Summarization}, 
+      author={Philippe Laban and Tobias Schnabel and Paul N. Bennett and Marti A. Hearst},
+      year={2021},
+      eprint={2111.09525},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2111.09525}, 
+}
+
+@inproceedings{q2evaluatingFactualConsistencyInKnowledgeGroundedDialogues,
+    title = "$Q^{2}$: {E}valuating Factual Consistency in Knowledge-Grounded Dialogues via Question Generation and Question Answering",
+    author = "Honovich, Or  and
+      Choshen, Leshem  and
+      Aharoni, Roee  and
+      Neeman, Ella  and
+      Szpektor, Idan  and
+      Abend, Omri",
+    editor = "Moens, Marie-Francine  and
+      Huang, Xuanjing  and
+      Specia, Lucia  and
+      Yih, Scott Wen-tau",
+    booktitle = "Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2021",
+    address = "Online and Punta Cana, Dominican Republic",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.emnlp-main.619/",
+    doi = "10.18653/v1/2021.emnlp-main.619",
+    pages = "7856--7870",
+    abstract = "Neural knowledge-grounded generative models for dialogue often produce content that is factually inconsistent with the knowledge they rely on, making them unreliable and limiting their applicability. Inspired by recent work on evaluating factual consistency in abstractive summarization, we propose an automatic evaluation metric for factual consistency in knowledge-grounded dialogue using automatic question generation and question answering. Our metric, denoted $Q^2$, compares answer spans using natural language inference (NLI), instead of token-based matching as done in previous work. To foster proper evaluation, we curate a novel dataset of dialogue system outputs for the Wizard-of-Wikipedia dataset, manually annotated for factual consistency. We perform a thorough meta-evaluation of $Q^2$ against other metrics using this dataset and two others, where it consistently shows higher correlation with human judgements."
+}
+
+
+@misc{gptScore,
+      title={GPTScore: Evaluate as You Desire}, 
+      author={Jinlan Fu and See-Kiong Ng and Zhengbao Jiang and Pengfei Liu},
+      year={2023},
+      eprint={2302.04166},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2302.04166}, 
+}
+
+@misc{gval,
+      title={G-Eval: NLG Evaluation using GPT-4 with Better Human Alignment}, 
+      author={Yang Liu and Dan Iter and Yichong Xu and Shuohang Wang and Ruochen Xu and Chenguang Zhu},
+      year={2023},
+      eprint={2303.16634},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2303.16634}, 
+}
+
+@misc{chainOfThoughtPrompting,
+      title={Chain-of-Thought Prompting Elicits Reasoning in Large Language Models}, 
+      author={Jason Wei and Xuezhi Wang and Dale Schuurmans and Maarten Bosma and Brian Ichter and Fei Xia and Ed Chi and Quoc Le and Denny Zhou},
+      year={2023},
+      eprint={2201.11903},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2201.11903}, 
+}
+
+@misc{judgingLLMAsAJudgeMTBench,
+      title={Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena}, 
+      author={Lianmin Zheng and Wei-Lin Chiang and Ying Sheng and Siyuan Zhuang and Zhanghao Wu and Yonghao Zhuang and Zi Lin and Zhuohan Li and Dacheng Li and Eric P. Xing and Hao Zhang and Joseph E. Gonzalez and Ion Stoica},
+      year={2023},
+      eprint={2306.05685},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2306.05685}, 
+}
+@misc{factScore,
+      title={FActScore: Fine-grained Atomic Evaluation of Factual Precision in Long Form Text Generation}, 
+      author={Sewon Min and Kalpesh Krishna and Xinxi Lyu and Mike Lewis and Wen-tau Yih and Pang Wei Koh and Mohit Iyyer and Luke Zettlemoyer and Hannaneh Hajishirzi},
+      year={2023},
+      eprint={2305.14251},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2305.14251}, 
+}
+
+
+@misc{automaticEvaluationOfAttribution,
+      title={Automatic Evaluation of Attribution by Large Language Models}, 
+      author={Xiang Yue and Boshi Wang and Ziru Chen and Kai Zhang and Yu Su and Huan Sun},
+      year={2023},
+      eprint={2305.06311},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2305.06311}, 
+}
+
+@misc{attributionBench,
+      title={AttributionBench: How Hard is Automatic Attribution Evaluation?}, 
+      author={Yifei Li and Xiang Yue and Zeyi Liao and Huan Sun},
+      year={2024},
+      eprint={2402.15089},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2402.15089}, 
+}
+@misc{ares,
+      title={ARES: An Automated Evaluation Framework for Retrieval-Augmented Generation Systems}, 
+      author={Jon Saad-Falcon and Omar Khattab and Christopher Potts and Matei Zaharia},
+      year={2024},
+      eprint={2311.09476},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2311.09476}, 
+}
+
+@misc{ragas,
+      title={Ragas: Automated Evaluation of Retrieval Augmented Generation}, 
+      author={Shahul Es and Jithin James and Luis Espinosa-Anke and Steven Schockaert},
+      year={2025},
+      eprint={2309.15217},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2309.15217}, 
+}
+
+@article{specter,
+  title={SPECTER: Document-level Representation Learning using Citation-informed Transformers},
+  author={Arman Cohan and Sergey Feldman and Iz Beltagy and Doug Downey and Daniel S. Weld},
+  journal={ArXiv},
+  year={2020},
+  volume={abs/2004.07180},
+  url={https://api.semanticscholar.org/CorpusID:215768677}
+}
+@misc{semanticScholarApi, 
+      url={https://api.semanticscholar.org/api-docs/}, 
+      journal={Semantic scholar - academic graph API}
+} 
+
+@misc{ruler,
+      title={RULER: What's the Real Context Size of Your Long-Context Language Models?}, 
+      author={Cheng-Ping Hsieh and Simeng Sun and Samuel Kriman and Shantanu Acharya and Dima Rekesh and Fei Jia and Yang Zhang and Boris Ginsburg},
+      year={2024},
+      eprint={2404.06654},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2404.06654}, 
+}
+
+@unknown{contextIsWhatYouNeed,
+author = {Paulsen, Norman},
+year = {2025},
+month = {09},
+pages = {},
+title = {Context Is What You Need: The Maximum Effective Context Window for Real World Limits of LLMs},
+doi = {10.48550/arXiv.2509.21361}
+}
+
+@misc{qwen2.5-72B-Instruct,
+      url={https://huggingface.co/Qwen/Qwen2.5-72B-Instruct}
+}
+@misc{Mixtral-8x7B-Instruct-v0.1,
+      url={https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1}
+}
+
+
+@inproceedings{citationAKeyToBuildingResponsibleAndAccountableLargeLanguageModels,
+    title = "Citation: A Key to Building Responsible and Accountable Large Language Models",
+    author = "Huang, Jie  and
+      Chang, Kevin",
+    editor = "Duh, Kevin  and
+      Gomez, Helena  and
+      Bethard, Steven",
+    booktitle = "Findings of the Association for Computational Linguistics: NAACL 2024",
+    month = jun,
+    year = "2024",
+    address = "Mexico City, Mexico",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2024.findings-naacl.31/",
+    doi = "10.18653/v1/2024.findings-naacl.31",
+    pages = "464--473",
+    abstract = "Large Language Models (LLMs) bring transformative benefits alongside unique challenges, including intellectual property (IP) and ethical concerns. This position paper explores a novel angle to mitigate these risks, drawing parallels between LLMs and established web systems. We identify ``citation''{---}the acknowledgement or reference to a source or evidence{---}as a crucial yet missing component in LLMs. Incorporating citation could enhance content transparency and verifiability, thereby confronting the IP and ethical issues in the deployment of LLMs. We further propose that a comprehensive citation mechanism for LLMs should account for both non-parametric and parametric content. Despite the complexity of implementing such a citation mechanism, along with the potential pitfalls, we advocate for its development. Building on this foundation, we outline several research problems in this area, aiming to guide future explorations towards building more responsible and accountable LLMs."
+}
+
+@misc{aSurveyOfEvidenceBasedTextGenerationWithLargeLanguageModels,
+      title={Attribution, Citation, and Quotation: A Survey of Evidence-based Text Generation with Large Language Models}, 
+      author={Tobias Schreieder and Tim Schopf and Michael Färber},
+      year={2025},
+      eprint={2508.15396},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2508.15396}, 
+}
+
+@misc{unArxive2024,
+      url={https://huggingface.co/datasets/ines-besrour/unarxive_2024}
+}
+
+
+@misc{pictogramsForTextSpanExtractionImage,
+      url={https://thenounproject.com/browse/icons/term/science-paper/}
+
+}
+@misc{marag,
+      title={MA-RAG: Multi-Agent Retrieval-Augmented Generation via Collaborative Chain-of-Thought Reasoning}, 
+      author={Thang Nguyen and Peter Chin and Yu-Wing Tai},
+      year={2025},
+      eprint={2505.20096},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2505.20096}, 
+}
+
+
+@inproceedings{unarXive2022,
+   title={unarXive 2022: All arXiv Publications Pre-Processed for NLP, Including Structured Full-Text and Citation Network},
+   url={http://dx.doi.org/10.1109/JCDL57899.2023.00020},
+   DOI={10.1109/jcdl57899.2023.00020},
+   booktitle={2023 ACM/IEEE Joint Conference on Digital Libraries (JCDL)},
+   publisher={IEEE},
+   author={Saier, Tarek and Krause, Johan and Färber, Michael},
+   year={2023},
+   month=june, pages={66–70} }

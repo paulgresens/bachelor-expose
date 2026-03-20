@@ -9,7 +9,7 @@ complex questions:
 multi document reasoning questions 
     - (because of 4 agent pipeline, question decomposition), multi-hop
 
-CONTEXT INDEPENDENCE / open domain questions: questions must contain all context to be standalone answerable
+CONTEXT INDEPENDENCE / open-domain questions: questions must contain all context to be standalone answerable
     -this includes not:
     -referencing the paper or its content the questions is originally based on
     -example “What is the significance of the parameter λ in the context of this paper?”
@@ -29,11 +29,11 @@ current Datasets:
     domain alignment: only 1585 NLP papers (really narrow, not as wide as squai)
     complex questions: simple factual lookup: 1909.00694:  "What is the seed lexicon", 1909.00430:  "How much more data does the model trained using XR loss have access to, compared to the fully supervised model"
     multi document reasoning questions : no, single paper ("grounded in a single paper of interest")
-    context independence: not independant, implicit references to papers, contents
+    context independence: not independent, implicit references to papers, contents
     text format: yes
     ground truth: yes
 notes: 
-    -question written as follow to of title, abstract of particular paper (vertiefend nachfragen quasi, Questionschreibe sehen nur Title und Abstract, nur Fragen nicht beantwortbar von diesen), answer identified in paper --> promises that questions require more complex document level reasoning (abstract --> rich promp, academic papers naturally trigger question that require supporting or refuting claims)
+    -question written as follow to of title, abstract of particular paper (vertiefend nachfragen quasi, Questionschreibe sehen nur Title und Abstract, nur Fragen nicht beantwortbar von diesen), answer identified in paper --> promises that questions require more complex document-level reasoning (abstract --> rich promp, academic papers naturally trigger question that require supporting or refuting claims)
     - human written questions by regular NLP paper readers, answered by seperate people + serached evidence in paper by the answerer (answerer access to fulltext and graps/ images) --> only questions they deemed answerable stay in dataset
     --> focuses on entire papers
     --> shows that state of the art transformer (2017) lags behind humans in answering questions and providing evidence 
@@ -95,7 +95,7 @@ ExpertQA
     domain alignment: strong match if sorted out to the fields that squai also has
     complex questions: strong match, challending, require reasoning and open-ended
     multi document reasoning questions : yes, but sources are weblinks, not scientific papers
-    context independence: stron match, questions are context independant
+    context independence: stron match, questions are context independent
     text format: yes
     ground truth: ground truths are given, but they are weblinks not scientific papers --> hard evaluation or filtering to squai dataset
     --> only 2177 examples over 32 fields --> way to small if filtered to unArxive information (todo make educated guess how many left after filtering here)
@@ -105,7 +105,7 @@ notes:
     -field relevant questions as well as claim level judgement
     -verifyability is important for high stake fields (e. g. medicine and law)
     - questions are collected by askins experts what they are curious about or what they have encountered --> no concrete fact basis
-    - questions answerd by LLM based systems with attributions (purely generative, retrieval augmented, post hoc)
+    - questions answered by LLM based systems with attributions (purely generative, retrieval augmented, post hoc)
     - answer and evidence then judged by expoert for informativeness, citeworthiness and factuality (and how faithfull claim is to accompanying evidence and how reliable the evidence's source is) 
     - finally experts revise each claim, so it is faithful to reliable evidences and factually correct
     - 1. Retrieve-and-read systems generate more complete attributions compared to LLM prompting and post-hoc attribution, but struggle to produce citations for all cite-worthy claims.
@@ -126,9 +126,8 @@ notes:
     -also has comparison overview of qa datasets
     -scientific literature is dense and requires deep understand and background knowledge to interact with
     -2937 questions, dataset ML domain, sources from peer rewies on the open review platforms (quetsions from reviewers, answered by writer of paper - both domain experts) --> tries to be a dataset with deep comprehension questions of the paper
-    - human annotation of questions, since not all are relevant (keeping most relevant questions, rewriting both question and answer to be "context independant"(third person, no biasing language, + a little more context) and edit references(so its clear for example which figure is meant)), sort out only the information seeking ones (sometimes requireing multiple papers)
+    - human annotation of questions, since not all are relevant (keeping most relevant questions, rewriting both question and answer to be "context independent"(third person, no biasing language, + a little more context) and edit references(so its clear for example which figure is meant)), sort out only the information seeking ones (sometimes requireing multiple papers)
     - questions include information provided in graphs, figures, tables, equations,...
-
 
 PeerQA
     domain alignment: strong alignment
@@ -144,6 +143,15 @@ notes:
     - questions only target single paper
     - questions are decontextualized and split up, filter to only information seeking
     - authors themselfes provide answer and the relevant text spans for answer grounding
+
+IRPAPERS: A VISUAL DOCUMENT BENCHMARK FOR SCIENTIFIC RETRIEVAL AND QUESTION ANSWERING
+    -to small (180 questions)
+    -needle in the haystack (only 1 paper to answer)
+    -simple questions
+    -includes image retrieval
+
+-wie datensatz generiert wird
+
 
 
 
@@ -173,3 +181,11 @@ dataset generation
 
 datasets mentioned but not useful:
 -SciFact : input claim --> output verificatinon (proof/contradict of that), no questions in the dataset (only declarative statements from papers abstract)
+
+
+
+
+--------------------------------------------
+https://arxiv.org/abs/2404.06654
+
+real length of context that models can use
