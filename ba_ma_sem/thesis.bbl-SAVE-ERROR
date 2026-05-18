@@ -2835,14 +2835,14 @@
       \verb 10.48550/arXiv.2509.21361
       \endverb
     \endentry
-    \entry{qwen2.5-72B-Instruct}{misc}{}{}
+    \entry{moonshotKimi2.6}{misc}{}{}
       \field{sortinit}{5}
       \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
       \verb{urlraw}
-      \verb https://huggingface.co/Qwen/Qwen2.5-72B-Instruct
+      \verb https://huggingface.co/moonshotai/Kimi-K2.6
       \endverb
       \verb{url}
-      \verb https://huggingface.co/Qwen/Qwen2.5-72B-Instruct
+      \verb https://huggingface.co/moonshotai/Kimi-K2.6
       \endverb
     \endentry
     \entry{ruler}{misc}{}{}
@@ -2914,14 +2914,142 @@
       \verb https://arxiv.org/abs/2404.06654
       \endverb
     \endentry
-    \entry{Mixtral-8x7B-Instruct-v0.1}{misc}{}{}
+    \entry{intelligenceDegredation}{misc}{}{}
+      \name{author}{3}{}{%
+        {{hash=8299411e801162727f349d4f6e600064}{%
+           family={Wang},
+           familyi={W\bibinitperiod},
+           given={Weiwei},
+           giveni={W\bibinitperiod}}}%
+        {{hash=725228bb2b999b5c206402f07f5b7935}{%
+           family={Min},
+           familyi={M\bibinitperiod},
+           given={Jiyong},
+           giveni={J\bibinitperiod}}}%
+        {{hash=3b0a1a1f8921c5807bd1b6d907023c4e}{%
+           family={Zou},
+           familyi={Z\bibinitperiod},
+           given={Weijie},
+           giveni={W\bibinitperiod}}}%
+      }
+      \strng{namehash}{c973c3dc2c66a849f347437fb4f2074c}
+      \strng{fullhash}{c973c3dc2c66a849f347437fb4f2074c}
+      \strng{fullhashraw}{c973c3dc2c66a849f347437fb4f2074c}
+      \strng{bibnamehash}{c973c3dc2c66a849f347437fb4f2074c}
+      \strng{authorbibnamehash}{c973c3dc2c66a849f347437fb4f2074c}
+      \strng{authornamehash}{c973c3dc2c66a849f347437fb4f2074c}
+      \strng{authorfullhash}{c973c3dc2c66a849f347437fb4f2074c}
+      \strng{authorfullhashraw}{c973c3dc2c66a849f347437fb4f2074c}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CL}
+      \field{eprinttype}{arXiv}
+      \field{title}{Intelligence Degradation in Long-Context LLMs: Critical Threshold Determination via Natural Length Distribution Analysis}
+      \field{year}{2026}
+      \verb{eprint}
+      \verb 2601.15300
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2601.15300
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2601.15300
+      \endverb
+    \endentry
+    \entry{gptoss120B}{misc}{}{}
       \field{sortinit}{5}
       \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
       \verb{urlraw}
-      \verb https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1
+      \verb openai/gpt-oss-120b
       \endverb
       \verb{url}
-      \verb https://huggingface.co/mistralai/Mixtral-8x7B-Instruct-v0.1
+      \verb openai/gpt-oss-120b
+      \endverb
+    \endentry
+    \entry{isMultihopInDireCondition}{inproceedings}{}{}
+      \name{author}{4}{}{%
+        {{hash=7271d22448c83950b62ad1ab83d236e3}{%
+           family={Trivedi},
+           familyi={T\bibinitperiod},
+           given={Harsh},
+           giveni={H\bibinitperiod}}}%
+        {{hash=f34635e70b0099ab06a2684bf118b906}{%
+           family={Balasubramanian},
+           familyi={B\bibinitperiod},
+           given={Niranjan},
+           giveni={N\bibinitperiod}}}%
+        {{hash=d52b94839fda8bece4ad0c811146f04f}{%
+           family={Khot},
+           familyi={K\bibinitperiod},
+           given={Tushar},
+           giveni={T\bibinitperiod}}}%
+        {{hash=a9e0631f7cb86b51f2dbfd908c164960}{%
+           family={Sabharwal},
+           familyi={S\bibinitperiod},
+           given={Ashish},
+           giveni={A\bibinitperiod}}}%
+      }
+      \name{editor}{4}{}{%
+        {{hash=073903bf4f8271f1a80b3fdcc63d92c2}{%
+           family={Webber},
+           familyi={W\bibinitperiod},
+           given={Bonnie},
+           giveni={B\bibinitperiod}}}%
+        {{hash=fcbee11f57094a6fbbfcbf494f023974}{%
+           family={Cohn},
+           familyi={C\bibinitperiod},
+           given={Trevor},
+           giveni={T\bibinitperiod}}}%
+        {{hash=f3b78337b03e473fdd1fe07b5b127389}{%
+           family={He},
+           familyi={H\bibinitperiod},
+           given={Yulan},
+           giveni={Y\bibinitperiod}}}%
+        {{hash=621013bf54d3546375ad71f17f020b5b}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Yang},
+           giveni={Y\bibinitperiod}}}%
+      }
+      \list{location}{1}{%
+        {Online}%
+      }
+      \list{publisher}{1}{%
+        {Association for Computational Linguistics}%
+      }
+      \strng{namehash}{a63401a245dcd533e923bad37546f041}
+      \strng{fullhash}{d8eb1232cdb6560bfec8a4c8cff14df7}
+      \strng{fullhashraw}{d8eb1232cdb6560bfec8a4c8cff14df7}
+      \strng{bibnamehash}{a63401a245dcd533e923bad37546f041}
+      \strng{authorbibnamehash}{a63401a245dcd533e923bad37546f041}
+      \strng{authornamehash}{a63401a245dcd533e923bad37546f041}
+      \strng{authorfullhash}{d8eb1232cdb6560bfec8a4c8cff14df7}
+      \strng{authorfullhashraw}{d8eb1232cdb6560bfec8a4c8cff14df7}
+      \strng{editorbibnamehash}{7126226c96b902f79c86c0a19c719ffe}
+      \strng{editornamehash}{7126226c96b902f79c86c0a19c719ffe}
+      \strng{editorfullhash}{b493927e65eacfc394fe1e594cf72a89}
+      \strng{editorfullhashraw}{b493927e65eacfc394fe1e594cf72a89}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Has there been real progress in multi-hop question-answering? Models often exploit dataset artifacts to produce correct answers, without connecting information across multiple supporting facts. This limits our ability to measure true progress and defeats the purpose of building multi-hop QA datasets. We make three contributions towards addressing this. First, we formalize such undesirable behavior as disconnected reasoning across subsets of supporting facts. This allows developing a model-agnostic probe for measuring how much any model can cheat via disconnected reasoning. Second, using a notion of \textit{contrastive support sufficiency}, we introduce an automatic transformation of existing datasets that reduces the amount of disconnected reasoning. Third, our experiments suggest that there hasn{'}t been much progress in multi-hop QA in the reading comprehension setting. For a recent large-scale model (XLNet), we show that only 18 points out of its answer F1 score of 72 on HotpotQA are obtained through multifact reasoning, roughly the same as that of a simpler RNN baseline. Our transformation substantially reduces disconnected reasoning (19 points in answer F1). It is complementary to adversarial approaches, yielding further reductions in conjunction.}
+      \field{booktitle}{Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP)}
+      \field{month}{11}
+      \field{title}{Is Multihop {QA} in {DiRe} Condition? Measuring and Reducing Disconnected Reasoning}
+      \field{year}{2020}
+      \field{pages}{8846\bibrangedash 8863}
+      \range{pages}{18}
+      \verb{doi}
+      \verb 10.18653/v1/2020.emnlp-main.712
+      \endverb
+      \verb{urlraw}
+      \verb https://aclanthology.org/2020.emnlp-main.712/
+      \endverb
+      \verb{url}
+      \verb https://aclanthology.org/2020.emnlp-main.712/
       \endverb
     \endentry
   \enddatalist

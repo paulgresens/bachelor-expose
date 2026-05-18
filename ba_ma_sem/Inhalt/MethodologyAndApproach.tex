@@ -23,44 +23,119 @@
     % question answer as precise as possible
     % add arxiv ids of used papers
 
-% CoT prompt additional LLM for the question-answer pair and each individual paper text to determine wether it was used or not
+% CoT prompt additional LLM for the question-answer pair and each individual paper text to determine whether it was used or not
 % 
 
 % talk about how the dataset looks
 To curate a dataset of high-quality, expert-level scientific question-answer pairs, a fully automated pipeline is applied. 
-It consists of three consecutive steps: document selection, question answer generation and document usage verification, in order to ensure that generated questions and answers are scientifically rigorous and strictly dependent on multi-document information synthesis to be answered, as well as reliably providing associated ground truth documents alongside.
+It consists of three consecutive steps: document selection, question answer generation and quality insurance, in order to ensure that generated questions and answers are scientifically rigorous and strictly dependent on multi-document information synthesis to be answered, as well as reliably providing associated ground truth documents alongside.
 \subsection{Document selection}
-To match the underlying document corpus, selectable papers are restricted to those of the unarXive 2022 dataset, yet in theory this could be expanded at will. A randomly selected anchor paper as well as its cited references serve as the foundation for generating a single question-answer pair, ensuring broad coverage across the whole dataset. For each paper, a document-level SPECTER \cite{specter} vector embedding is retrieved via the Semantic Scholar academic graph API \cite{semanticScholarApi}. Leveraging citation graphs, these vectors provide dense representations of a paper's title and abstract, which are subsequently used to calculate the cosine similarity and thus the semantic similarity of each paper with the anchor document. To ensure topical alignment while excluding highly redundant work, a subset of candidate papers with a cosine similarity between 0.7 and 0.9 is selected. Four of these papers are then chosen at random to be used alongside the anchor paper for further generation. Restricting the model input to five papers in total provides a multitude of topical overlaps for the model to choose from without resulting in exceedingly long prompts, mitigating the risk of "Lost in the Middle" effects. If a chosen anchor paper fails to provide at least four appropriate references, it is considered insufficient to be used in the dataset.
+To match the underlying document corpus, selectable papers are restricted to those of the unarXive 2022 dataset, yet for other application this could be expanded at will. A randomly selected anchor paper as well as its cited references serve as the foundation for generating a single question-answer pair. For each paper, a document-level SPECTER \cite{specter} vector embedding is retrieved via the Semantic Scholar academic graph API \cite{semanticScholarApi}. Leveraging citation graphs, these vectors provide dense representations of a paper's title and abstract, which are subsequently used to calculate the cosine similarity and thus the semantic similarity of each paper with the anchor document. To ensure topical alignment while excluding highly redundant work, a subset of candidate papers with a cosine similarity between 0.7 and 0.9 is selected. Four of these papers are then chosen at random to be used alongside the anchor paper for generation. Restricting the model input to five papers in total provides a multitude of topical overlaps for the model to choose from without resulting in exceedingly long prompts, mitigating the risk of "Lost in the Middle" effects. If a chosen anchor paper fails to provide at least four appropriate references, it is considered insufficient to be used in the dataset.
 % rephrase realized, rephrase docuemnt usage verification
 % justify 0.7 to 0.9
 % maybe dont mention lost in the middle just here
 
 \subsection{Question-Answer generation}
-While modern LLMs offer increasingly large context windows, usually even above 100,000 tokens, empirical studies have shown severe performance degredation in tasks like complex reasoning, data retrieval and logic problems, accompanied by drastically increased hallucination \cite{contextIsWhatYouNeed}. In the generation step, the pipeline applies a Qwen/Qwen2.5-72B-Instruct \cite{qwen2.5-72B-Instruct} model, shown to have an effective context size with minimal degredation of about 32k tokens \cite{ruler}. Although the model can be changed at will, for this specific configuration, the input should not exceed ~128,000 \footnote{in standard heuristics for scientific english one token translates to roughly four characters} characters, thus ~25,000 characters per paper - the base limit.
-With papers being highly variable in length, an adaptive per paper character limit is applied, distributing leftover characters from papers shorter than the base limit, weighted by paper length. Thus, the adaptive character limit for papers with a length greater then the base limit can be determined by: 
+While modern LLMs offer increasingly large context windows, usually even above 100,000 tokens, empirical studies have shown severe performance degredation in tasks like complex reasoning, data retrieval and logic problems, accompanied by drastically increased hallucination \cite{contextIsWhatYouNeed}. In the generation step, the pipeline applies a moonshotai/Kimi-K2.6 \cite{moonshotKimi2.6} model, supporting a context window of approximately 256.000 tokens. In practice however, the "effective context window", in which models only suffer from minimal performance degredations with increasingly long inputs, has been show to drastically lower by emipirical studies \cite{ruler} and practitioner reports, with some studies estimating it as low as 40\% of the maximum supported context window \cite{intelligenceDegredation}. To ensure high reasoning capabilities, the pipeline applies an adaptive character limit for each paper text, enforcing a total upper bound of 300.000 characters for all papers which conservatively approximated translates to roughly 100.000 tokens\footnote{in standard heuristics for scientific english one token translates to roughly three to four characters} or 40\% usage of Kimi-K2.6's context window. Papers are assigned input space according to the following formula, allowing for for full and efficient utilization of the context window, even if papers are highly variable in length:
 \begin{equation}
 C_{adaptive} = \left\lfloor C_{base} + \left( \frac{l_{paper}}{\sum_{p \in P_{above}} len(p)} \right) \times \sum_{s \in P_{below}} (C_{base} - len(s)) \right\rfloor
 \end{equation}
-Paper texts longer than their adaptive character limit are then head and tail truncated, retaining the first and last $\frac{C_{adaptive}}{2}$ characters which are usually the most information dense for scientific papers.
+Paper texts longer than their adaptive character limit are then head and tail truncated, retaining the first and last $\lfloor\frac{C_{adaptive}}{2}\rfloor$ characters, which are the most information dense for scientific papers.
 
-Subsequently the LLM is prompted using a two-step strategy. Firstly the model is tasked with extracting topic overlaps between papers, identifying important concepts and entities as well topical relationships between documents. The following step is the generation step, where the model is prompted to generate one high quality and complex question-answer pair targeting a subset of the previously extracted concepts or entities. The model is incentivized to avoid simple definitional questions, instead opting for complex inquiries, that require information synthesis and evaluation across multiple source documents in order to be answered. Additionally, the model is instructed to answer the question as precisely as possible, providing a precision-biased subset of the underlying papers used during generation alongside. The complete prompt instructions are provided in Listing \ref{lst:questionAnswerGenerationPrompt}.
-% add more explanation on why stuff is done like this
-
-
-
+Subsequently the LLM is prompted using a two-step strategy. Firstly the model is tasked with selecting the best pair of papers (A,B), where paper A provides an intermediate entity, method, dataset or similar and paper B evaluating, extending, contradicting or relying on A's intermediate element. Following that, the LLM is tasked with generating a single Question-Answer pair based on its selected pair, whose answer can only be derived by following a sequential reasoning process across both papers, applying paper A's intermediate element to paper B. Additionally, the model is instructed to answer the question as precisely as possible, providing a precision-biased subset of the underlying papers used during generation alongside. The complete prompt instructions are provided in Listing \ref{lst:questionAnswerGenerationPrompt}.
+% IMPORTANT FIX THE LIMIT IS 25000 TODO TODO TODO
 % Lost in the Middle: How Language Models Use Long Contexts" (Liu et al., 2023).
 
 % hallucinating used papers
 % lazily attributing to many
 % judge every single paper if really used, 
 % CoT prompting, 
-\subsection{Document usage verification}
-Generative LLMs have been shown to be notoriously prone to hallucinating citations and falsely attributing sources. Thus, their ability to reliably track a paper's actual contribution to the generated question-answer pair is drastically reduced. In order to mitigate this and ensure the dataset's integrity, a verification step is applied, employing a secondary LLM, specifically mistralai/Mixtral-8x7B-Instruct-v0.1 \cite{Mixtral-8x7B-Instruct-v0.1}, to act as a judge for the actual usage of each paper individually. Utilizing a Chain-of-Thought (CoT) approach, the model is first instructed to identify core scientific claims and topics in the question-answer pair, before determining if a paper provides explicit evidence or data beyond mere keyword overlap, supporting the claims made in the answer, resulting in a final binary verdict for each paper. The complete prompt instructions are provided in Listing \ref{lst:usageJudgementPrompt}.
-    
-The full dataset is then obtained by applying a consensus filter between both generator and judge, discarding all question-answer pairs with fewer than two source documents attributed by both LLMs, ensuring true multihop characteristic for the whole dataset.
+\subsection{Quality insurance}
+In order to ensure the dataset's integrity two seperate evaluation steps are applied, both utilizing a openai/gpt-oss-120b \cite{gptoss120B} model.
+The first judge evaluates each Question-Answer pair along six distinct dimension, providing judgement on how good each criteria is satisfied on a three-point ordinal scale.
+\begin{enumerate}
+      \item  Multi-Hop validity: Does answering the question require combining both papers?
+      \item  Dependency Strength: Measure if the second reasoning step depends on the result of the first one
+      \item  Non-decomposability: Is the question NOT decomposable into independent sub-questions?
+      \item  Evidence distribution: Are both papers required and non-redundant?
+      \item  Answerability: Is the answer fully supported by the provided evidence?
+      \item  Decontextualization: Is the question self-contained and unambiguous? 
+\end{enumerate}
+The complete prompt instructions are provided in Listing \ref{lst:Judgement prompt}.
+% todo explain this more, better wording
+
+An analysis of disconnected reasoning by Trivedi et al. \cite{isMultihopInDireCondition} demonstrated, that many alleged multi-hop question-answering datasets do in fact not require true multi-hop reasoning, but can instead be solved through reasoning shortcuts, partial evidence or decomposition into independent subquestions. Using a methodology inspired by the DIRE \cite{isMultihopInDireCondition} framework, the second judge verifies, that questions cannot be answered under incomplete evidence, namely a subset $P' \subset P$ of ground truth papers $P$, but instead require all ground truth documents for a complete reasoning chain and answer. Thus the test outcome satisfies: $$\left( \forall P' \subset P : \neg\text{Pass}(P') \right) \land \text{Pass}(P)$$
+The complete prompt instructions are provided in Listing \ref{lst:DIRE prompt}.
+
+The final dataset is then obtained by filtering question-answer pairs to only those, successfully passing both judges.
 
 
 \section{Cited text span extraction}
+As previously discusses, cited text span attribution can be approached through a number of different paradigms, with methods being introduced and applied under vastly different circumstances. Following, a hierarchy of increasingly complex post-hoc extraction methods that will be applied on a unified dataset is introduced. All methods except the native SQuAI span extraction and the generative LLM method recieve tuples, composed of an answer sentence and a set of eligable source spans $\mathcal{W}(P)$ from the paper $P$, annotated as factual basis for that sentence during question answering. The set of source spans is composed of floating windows of contiguous sentences in the source document, up to a length of five, and can be denoted as: 
+
+% \(D = (s_1, s_2, \ldots, s_n)\). Candidate spans are then constructed as
+% floating windows of consecutive sentences with lengths from one to five:
+\[
+\mathcal{W}(P)
+=
+\bigcup_{k=1}^{5}
+\left\{
+s_i \oplus s_{i+1} \oplus \cdots \oplus s_{i+k-1}
+\;\middle|\;
+1 \leq i \leq n-k+1
+\right\},
+\]
+where \(k\) denotes the window size and \(\oplus\) denotes string concatenation
+with whitespace.
+
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{
+\begin{tabular}{cccc}
+    \hline
+    \textbf{\makecell{Extraction \\ Method}} & 
+    \textbf{\makecell{Retrieval\\Category}} & 
+    \textbf{\makecell{Candidate Selection\\(Top 10)}}  & \textbf{\makecell{Final Selection\\(Top 1)}} \\ \hline
+    1  & Native        & -                                                               & SQuAI \\
+    2  & Dense         & -                                                               & Bi-encoder \\
+    3  & Sparse        & -                                                               & BM25 \\             
+    4  & Hybrid        & Bi-encoder                                                      & BM25 \\ 
+    5  & Hybrid        & BM25                                                            & Bi-encoder \\                                 
+    6  & Hybrid        & -                                                               & BM25 \& Bi-encoder \tablefootnote{using Reciprocal Rank Fusion\label{fn:hybrid}}\\                                                             
+    7  & Cross-encoder & Bi-encoder                                                      & Cross-encoder\\
+    8  & Cross-encoder & BM25                                                            & Cross-encoder \\                                                             
+    9  & Cross-encoder & BM25 \& Bi-encoder \textsuperscript{\ref{fn:hybrid}} & Cross-encoder\\                                                             
+    10 & Generative    & - & LLM \\   \hline                                                    
+\end{tabular}%
+}
+% TODO better formattig here
+    \caption{Cited text span extraction methods overview}
+\end{table}
+
+% todo talk about performance
+\subsection{Native SQuAI extraction baseline }
+The first method relies on SQuAI's native text span extraction mechanism, utilizing simple lexical matching. Since it is only capable of providing one span per paper, even if it is cited repeatedly in different contexts, it is limited by design. Nevertheless, representing the attribution behaviour of the SQuAI system, it serves as a native baseline for further extraction pipelines.
+\subsection{Dense retrieval}
+Applying a bi-encoder, this method selects the best fitting source span out of all floating windows based on the similarity of the span's dense vector representation with that of the answer sentence it is attributed to. It measures the suitability of relying exclusively on semantic similarity for source span attribution. As a dense retrieval baseline, it is capable of identifying appropriate source spans with different wording, but prone to overlooking precise terminology.
+\subsection{Sparse retrieval}
+The third method utilizes BM25, reranking source spans based on their lexical similarity with the corresponding answer sentence. The highest scoring span is then selected as final attributed span. Representing the sparse retrieval baseline BM25 is especially effective with precise terminology, however less robust to to paraphrasing.
+
+\subsection{Hybrid retrieval }
+Hybrid methods aim to combine sparse and dense retrieval, leveraging their complementary strengths and weaknesses. Thus, these variants evaluate whether the retrieval performance can be enhanced by combining both approaches into a single method. 
+The fourth method applies a two-stage retrieval method, with the bi-encoder selecting the top ten candidate windows and BM25 selecting the final span, with method five reversing their order. While the former prioritizes semantic recall during candidate selection and lexical precision during final span selection, the latter reverses this order. Comparing both allows for analysis, if either of those paradigms is better suited for candidate or final span selection. 
+The sixth method combines both lexical and semantic matching into a single score using Reciprocal Rank Fusion (RRF). Instead of sequential application, this variant evaluates hybrid retrieval performance without an imposed order between the components themselves. 
+
+
+\subsection{Cross-Encoder reranking}
+Overcoming the limitation of both BM25 and bi-encoder retrieval of only being able to process the answer sentence and source span in isolation, the following methods introduce cross-encoders, allowing for joint processing of both. However, as cross-encoders are far more computationally expensive than previous methods and thus not feasible to run on the whole set of floating window candidate spans, these methods instead use different candidate selectors, with the cross-encoder selecting the best fitting final span for the answer sentence.
+Methods seven and eight apply semantic and lexical matching, while method nine utilizes both joined together as candidate selector.
+
+\subsection{Generative LLM}
+The last method uses a generative LLM to extract the best supporting span from the source document. Unlike previous methods, it does not rerank candidate spans, but instead prompts the model to identify the best suited text span. Representing a generative approach, it is used to test whether a LLM's reasoning capabilities can improve evidence selection.
+
+
+
+
 \section{Span evaluation}
 
 

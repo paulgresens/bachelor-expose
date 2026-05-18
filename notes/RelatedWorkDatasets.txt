@@ -189,3 +189,11 @@ datasets mentioned but not useful:
 https://arxiv.org/abs/2404.06654
 
 real length of context that models can use
+
+
+
+------------------------------------------------------------------------------------------------------------
+newest findings:
+-datasets claiming multihop are not truly multihop
+
+What makes a good question: The question itself cannot give away the bridge. It must present a starting point (Head Entity) and ask for an endpoint (Tail Entity), forcing the AI to "seek" the hidden bridge document that connects them.
