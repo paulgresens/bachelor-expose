@@ -73,7 +73,7 @@ Paper Texts:
 \end{lstlisting}
 
 
-\begin{lstlisting}[caption={Judgement prompt}, label={lst:Judgement prompt}]
+\begin{lstlisting}[caption={Dataset Generation Judgement prompt}, label={lst:Dataset Generation Judgement prompt}]
 You are evaluating a scientific question-answer (Q-A) example.
 Your goal is to assess whether it is a valid 2-hop, evidence-grounded scientific multi-hop question.
 A valid example must:
@@ -100,26 +100,33 @@ Reasoning Steps: {reasoningSteps}
 EVALUATION CRITERIA
 A. Reasoning Structure
 Multi-hop Validity: Does answering the question require combining both papers?
--GOOD: Both papers are strictly required
+Assesses whether answering the question requires integrating information from both papers. Thus, this criterion is only satisfied, if neither paper provides sufficient information for deriving the complete answer.
+-GOOD: Both papers are strictly required, the question cannot be answered using only one paper
 -BORDERLINE: Both papers contribute but one may be sufficient
 -BAD: Only one paper is sufficient (single-hop)
 
-Dependency Strength: Does Step 2 depend on the result of Step 1?
+Dependency Strength: 
+evaluates whether the steps in the reasoning chain are sequentially dependent, in order for the conclusion to be drawn. Thus, the second reasoning step cannot be solved without first applying or interpreting the first one.
+Step 2 must require the result, entity, method, dataset, variable, or conclusion obtained in Step 1.
 GOOD: Step 2 strictly requires Step 1
 BORDERLINE: Partial dependence
 BAD: Steps are independent (disconnected reasoning)
 
 Non-Decomposability: Is the question NOT decomposable into independent sub-questions?
+Verifies that questions cannot be broken down into independent single-hop sub-questions. Instead, reasoning steps must be connected in such a way, that separately solving them would not be sufficient for deriving an answer.
 -GOOD: Cannot be split; requires joint reasoning
 -BORDERLINE: Partially decomposable
 -BAD: Clearly decomposable into independent sub-questions
 
-B. Evidence Grounding: Evidence DistributionAre both papers required and non-redundant?
+B. Evidence Grounding
+Evidence Distribution: Are both papers required and non-redundant?
+Examines whether both papers contribute distinct and necessary evidence, ensuring that required evidence is spread across both papers and questions cannot be answered by using a single dominant source, with redundant information.
 -GOOD: Each paper contributes distinct, necessary information
 -BORDERLINE: Some overlap or redundancy
 -BAD: One paper is sufficient; the other is redundant
 
 Answerability: Is the answer fully supported by the provided evidence?
+Assesses whether the answer is fully supported and obtainable by only relying on information present in the  papers, without requiring external knowledge or speculative inference, not explicitly supported by either paper. 
 -GOOD: Fully supported by cited evidence
 -BORDERLINE: Partially supported
 -BAD: Not supported or contradicts the evidence
@@ -162,6 +169,7 @@ OUTPUT FORMAT
     }},
     "confidence": <0 to 1 rate how confident you are in the judgements>
 }}
+
 Do not deviate from this schema. Do not add any preciding information like ```json. Only Answer with the valid json
 \end{lstlisting}
 
@@ -188,3 +196,40 @@ OUTPUT FORMAT
 Do not deviate from this schema. Do not add any preciding information like ```json. Only Answer with the valid json
 \end{lstlisting}
 
+
+
+\begin{lstlisting}[caption={LLM cited text span extraction prompt}, label={lst:LLM cited text span extraction prompt}]
+You will be given the text of a scientific paper and a claim which was generated based on the content of the paper. 
+You can assume that all information in the paper is factually correct. Your job is, that for the given claim you should extract the section of the paper which provides the 
+best factual basis for justifying the statement. For that you should at least extract one sentence and up to 5 sentences which must be consecutively present in the paper. 
+The extraction can only contain sentences that are directly quoted as they are written in the document. You are not allowed to make any adjustments whatsoever to them.
+Here is a list of criteria that defines what a good
+extraction looks like:
+    -The claim is the logical consequence of the facts in the context
+    -The claim and the context cover the same topic
+    -each topic that is present in the claim is also covered in the context
+    -the context does not contradict the claim
+    -the claim includes only information provided in the context or correct generalizations or interpretations of that information
+    -the context includes every piece of information needed to justify each individual piece of the claim
+    -the context and the claim convey the same meaning, even though the claim might be worded differently
+    -the context includes every semantic entity that is present in the claim
+    -the information in the context is unambiguous and its interpretation can only lead to the logical conclusions that are drawn in the claim
+Search for the context, that fulfills all those criteria the best.
+
+Input: 
+-text of a scientific paper
+-claim generated by an LLM on the basis of this paper
+
+Output:
+-The extracted context
+
+Answer with only the extracted sentences, exactly as they are consecutively! written in the document
+You are not allowed to hallucinate or make any adjustments to the sentences. You are also now allowed to add additional comments or headllines.
+Strictly reply with only those sentences. 
+Try to select as few sentences as possible. The response must include every information needed to fullfill the criteria, but should not contain any unnecessary information,
+that is not needed to justify the claim.
+
+
+Scientific Paper Text : "{documentText}"
+Claim: "{answer}"
+\end{lstlisting}
