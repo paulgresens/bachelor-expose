@@ -1,15 +1,904 @@
 \chapter{Evaluation}
 \label{cha:Evaluation}
-
+TODO write intro for evalution
 \section{Dataset}
-% show one example question and how its really multihop
-% evalute against criteria in related work
+% GOOD
+\subsection{Dataset filtering}
+The dataset generation process attempted to construct question-answers pairs from 
+% INSERT THE NUMBER OF summed up alreadyUsedArxivIds 
+anchor papers, out of which 11203 provided enough cited papers with similar or related content, measured by the SPECTER vector embedddings, resulting in successfull generation. 
+% maybe mention that they are also part of the unarxive corpus
+Out of those candidates, 470 ($\sim$4.2\%) were retained for the final dataset, scoring a "GOOD" judgement for each quality assurance category such as Multi-Hop Validity or Non-Decomposability, as well as passing the DIRE filter; both methodologies are described in section \ref{subsec:quality_assurance}. While this highly restrictive approach may also discard potentially good questions, this dataset focuses on precision rather than recall in order to ensure that subsequent evaluations are undistorted, thus aiming to minimize the number of unsuitable QA-pairs in the filtered dataset. The resulting judgements of the quality assurance categories and DIRE filter are distributed as follows:
 
-\section{Cited text span extraction}
+\begin{figure}[H]
+    \raggedright
+    \makebox[\textwidth][l]{%
+    \begin{tikzpicture}
+        \begin{axis}[
+            xbar,
+            width=0.8\textwidth,
+            height=5cm,
+            xmin=0,
+            xmax=11203,
+            xlabel={question-answer pair count},
+            xtick={0,5000,10000},
+            scaled x ticks=false,
+            axis x line*=bottom,
+            axis y line*=middle,
+            ytick={1,2,3,4},
+            axis line style={draw=black},
+            yticklabels={
+                Judgement and DIRE failed,    
+                Judgement failed,
+                DIRE failed,
+                Judgement and DIRE passed
+            },
+            y dir=reverse,
+            yticklabel style={font=\small, text width=4cm, align=left},
+            % nodes near coords={\pgfmathprintnumber[fixed,precision=0]{\pgfplotspointmeta}},
+            nodes near coords={%
+                \pgfmathfloattofixed{\pgfplotspointmeta}%
+                \let\countvalue\pgfmathresult
+                \pgfmathsetmacro{\percentage}{\countvalue/11203*100}%
+                \pgfmathprintnumber[fixed,precision=0,1000 sep={,}]{\countvalue}%
+                \hspace{0.5em}(\pgfmathprintnumber[fixed,precision=1]{\percentage}\%)%
+            },
+            point meta=x,
+            nodes near coords align={horizontal},
+            bar width=8pt,
+            enlarge y limits=0.12,
+            grid=major,
+            major grid style={draw=gray},
+        ]
+
+            \addplot[
+                draw=red!70!black,
+                fill=red!35,
+                bar shift=0pt
+            ] coordinates {
+                (7538,1)
+                (1655,2)
+                (1540,3)
+            };
+            \addplot[
+                draw=ForestGreen!70!black,
+                fill=ForestGreen!35,
+                bar shift=0pt
+            ] coordinates {
+                (470,4)
+            };
+
+        \end{axis}
+    \end{tikzpicture}%
+    }
+
+    \caption{Quality-assurance and DIRE filter outcomes}
+\end{figure}
+
+% GOOD
+While the majority of questions satisfy neither all quality-assurance criteria nor the DIRE filter, a substantial share of 28.5\% passes exactly one of the two filtering steps. While both the Multi-hop criterion and the DIRE filter are intented to identify insufficient multi-hop structure in the questions, the former is obtained by directly prompting an LLM and showed to be much less effective than the DIRE filter. A closer comparison reveals, that the rejected subsets of questions are overlapping but not identical, with DIRE rejecting almost twice as many as the Multi-hop criterion in absolute numbers. However DIRE rejects almost all canidates that failed the Multi-hop criterion but not vice versa, supporting the complementary usage of both filtering steps.
+
+\[
+\begin{aligned}
+P(MH_{\text{fail}} \mid DIRE_{\text{fail}})
+&=
+(n_{\text{each}} \cdot p_{\text{each}}
++ n_{\text{exactlyOne}} \cdot p_{\text{exactlyOne}}
++ n_{\text{unanswerable}} \cdot p_{\text{unanswerable}})
+\,/\, n_{DIRE_{\text{fail}}} \\
+&\approx 46.5\%.
+\end{aligned}
+\]
+\[
+\begin{aligned}
+P(DIRE_{\text{fail}} \mid MH_{\text{fail}})
+&=
+(n_{\text{each}} \cdot p_{\text{each}}
++ n_{\text{exactlyOne}} \cdot p_{\text{exactlyOne}}
++ n_{\text{unanswerable}} \cdot p_{\text{unanswerable}})
+\,/\, n_{MH_{\text{fail}}} \\
+&\approx 90.9\%.
+\end{aligned}
+\]
+% TODO maybe denote precisely what is what?
+%GOOD
+Figure \ref{fig:judgement_category_failure} shows the distribution of quality-assurance criteria failures. Since they are not mutually exclusive, a candidate QA-pair might fail several at once. 
+Non-Decomposability accounts for the largest number of failures, closely followed by Multi-Hop validity failures, while Answerability represents the third largest failure category. Together, this suggests that the biggest problem in the generation process remains the construction of a genuinely connected reasoning chain across both papers, including distinct information from both papers, while also not overgeneralizing or -interpreting said information, so that the question itself is still grounded in the source documents. This argument is further supported by the low conditional co-failure of the Evidence Distribution criterion as shown in figure \ref{tab:conditional_co_failure}, suggesting that while both papers do contribute distinct evidence, the LLM is unable to utilize it for the creation of a grounded, Non-Decomposable multi-hop question.
+Evidence Distribution failures themselves can be caused in two ways, by either having no meaningful overlap in the five papers presented to the LLM or it being unable to extract them. While not as low as decontextualization failures, this also remains a rare problem, suggesting that the LLM is quite capable of extracting them.
+In contrast, the LLM shows strong capability of decontextualizing the information, with errors caused by non standalone answerable questions arising so scarcely, that they are practically irrelevant.
+
+\begin{figure}[H]
+    \raggedright
+    \makebox[\textwidth][l]{%
+    \begin{tikzpicture}
+        \begin{axis}[
+            xbar,
+            width=0.8\textwidth,
+            height=8cm,
+            xmin=0,
+            xmax=11203,
+            xlabel={question-answer pair count},
+            xtick={0,5000,10000},
+            scaled x ticks=false,
+            axis x line*=bottom,
+            axis y line*=left,
+            ytick={1,2,3,4,5,6,7},
+            axis line style={draw=black},
+            yticklabels={
+                Non-Decomposability,
+                Multi-Hop Validity,
+                Answerability,
+                Dependency Strength,
+                Evidence Distribution,
+                Decontextualization,
+                Success
+            },
+            y dir=reverse,
+            yticklabel style={font=\small, text width=4cm, align=left},
+            nodes near coords={%
+                \pgfmathfloattofixed{\pgfplotspointmeta}%
+                \let\countvalue\pgfmathresult
+                \pgfmathsetmacro{\percentage}{\countvalue/11203*100}%
+                \pgfmathprintnumber[fixed,precision=0,1000 sep={,}]{\countvalue}%
+                \hspace{0.5em}(\pgfmathprintnumber[fixed,precision=1]{\percentage}\%)%
+            },
+            point meta=x,
+            nodes near coords align={horizontal},
+            bar width=8pt,
+            enlarge y limits=0.12,
+            grid=major,
+            major grid style={draw=gray},
+        ]
+
+            \addplot[
+                draw=red!70!black,
+                fill=red!35,
+                bar shift=0pt
+            ] coordinates {
+                (4782,1)
+                (4647,2)
+                (4035,3)
+                (1809,4)
+                (656,5)
+                (37,6)
+            };
+
+            \addplot[
+                draw=ForestGreen!70!black,
+                fill=ForestGreen!35,
+                bar shift=0pt
+            ] coordinates {
+                (2010,7)
+            };
+
+        \end{axis}
+    \end{tikzpicture}%
+    }
+
+    \caption{Quality-assurance outcomes}
+    \label{fig:judgement_category_failure}
+\end{figure}
+
+
+% okay, maybe dont say redundant
+Figure \ref{fig:dire_filter_outcomes} shows the mutually exclusive outcomes of the DIRE filter. By far the most prominent failure is the answerability of a question using exactly one of the two provided papers, indicating that a majority of generated questions rely on a single dominant source, marking a failure of generating a reasoning chain with genuine cross-paper connection. About 15.4\% of questions are answerable using either of the provided papers, being an even worse failure of such construction, targeting information that is redundant in both papers. In about  8.5\% of cases, questions are unanswerable even when using all provided papers as evidence, hinting at overgeneralization or hallucination by the LLM during the generation process. The remaining minority of 19\% of questions pass the DIRE filter successfully, again highlighting the precision-oriented character of the generation pipeline. 
+
+
+
+\begin{figure}[H]
+    \raggedright
+    \makebox[\textwidth][l]{%
+    \begin{tikzpicture}
+        \begin{axis}[
+            xbar,
+            width=0.7\textwidth,
+            height=5cm,
+            xmin=0,
+            xmax=11203,
+            xlabel={question-answer pair count},
+            xtick={0,5000,10000},
+            scaled x ticks=false,
+            axis x line*=bottom,
+            axis y line*=left,
+            ytick={1,2,3,4},
+            axis line style={draw=black},
+            yticklabels={
+                Answerable using exactly one paper,
+                Answerable using either paper,
+                Unanswerable,
+                Success
+            },
+            y dir=reverse,
+            yticklabel style={font=\small, text width=6cm, align=left, anchor=north east, yshift=0.7em},
+            % nodes near coords={\pgfmathprintnumber[fixed,precision=0]{\pgfplotspointmeta}},
+            nodes near coords={%
+                \pgfmathfloattofixed{\pgfplotspointmeta}%
+                \let\countvalue\pgfmathresult
+                \pgfmathsetmacro{\percentage}{\countvalue/11203*100}%
+                \pgfmathprintnumber[fixed,precision=0,1000 sep={,}]{\countvalue}%
+                \hspace{0.5em}(\pgfmathprintnumber[fixed,precision=1]{\percentage}\%)%
+            },
+            point meta=x,
+            nodes near coords align={horizontal},
+            bar width=8pt,
+            enlarge y limits=0.12,
+            grid=major,
+            major grid style={draw=gray},
+        ]
+
+            \addplot[
+                draw=red!70!black,
+                fill=red!35,
+                bar shift=0pt
+            ] coordinates {
+                (6406,1)
+                (1722,2)
+                (950,3)
+            };
+
+            \addplot[
+                draw=ForestGreen!70!black,
+                fill=ForestGreen!35,
+                bar shift=0pt
+            ] coordinates {
+                (2125,4)
+
+            };
+
+        \end{axis}
+    \end{tikzpicture}%
+    }
+
+    \caption{DIRE filter outcomes}
+    \label{fig:dire_filter_outcomes}
+\end{figure}
+
+
+
+
+% things to highlight
+% 
+
+
+
+\newcommand{\heatcell}[1]{%
+    \begingroup
+    % 0 -> no color, 100 -> full color intensity
+    \pgfmathtruncatemacro{\intensity}{min(100,max(0,round(#1)))}%
+    \edef\x{\endgroup
+        \noexpand\cellcolor{ForestGreen!\intensity!white}%
+    }%
+    \x
+    \makebox[1.2cm][r]{#1\%}%
+}
+
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lccccccccc}
+\cellcolor{gray!20} given failure    	                &  
+% \cellcolor{gray!20}\rotatebox{90}{total for this category} & 
+\cellcolor{gray!20}\rotatebox{90}{answerability}	       & 
+\cellcolor{gray!20}\rotatebox{90}{decontextualization}	   &  
+\cellcolor{gray!20}\rotatebox{90}{dependencyStrength}	   & 
+\cellcolor{gray!20}\rotatebox{90}{evidenceDistribution}	   & 
+\cellcolor{gray!20}\rotatebox{90}{multiHopValidity}	       & 
+\cellcolor{gray!20}\rotatebox{90}{nonDecomposability}	   & 
+\cellcolor{gray!20}\rotatebox{90}{answerableByEach}	       &  
+\cellcolor{gray!20}\rotatebox{90}{answerableByExactlyOne}  & 
+\cellcolor{gray!20}\rotatebox{90}{unanswerable}      \\
+\hline
+\cellcolor{gray!20} answerability	        	               &  -	                &  \heatcell{0.52}	    &  \heatcell{17.60}	        & \heatcell{3.47}	    & \heatcell{32.71}	& \heatcell{39.43}	    &  \heatcell{9.14}      & \heatcell{50.51}	        & \heatcell{17.32}  \\
+\cellcolor{gray!20} decontextualization	                       &  \heatcell{56.76}	    &  -	                &  \heatcell{13.51}	        & \heatcell{5.41}	    & \heatcell{40.54}	& \heatcell{40.54}	    &  \heatcell{5.41}      & \heatcell{59.46}	        & \heatcell{16.22}  \\
+\cellcolor{gray!20} dependencyStrength	    	               &  \heatcell{39.25}	    &  \heatcell{0.28}	    &  -	                    & \heatcell{5.20}	    & \heatcell{52.24}	& \heatcell{48.26}	    &  \heatcell{8.46}      & \heatcell{55.89}	        & \heatcell{11.11}  \\
+\cellcolor{gray!20} evidenceDistribution	                   &  \heatcell{21.34}	    &  \heatcell{0.30}	    &  \heatcell{14.33}	        & -	                    & \heatcell{90.09}	& \heatcell{54.42}	    &  \heatcell{26.68}     & \heatcell{65.85}	        & \heatcell{3.20}   \\
+\cellcolor{gray!20} multiHopValidity	    	               &  \heatcell{28.41}	    &  \heatcell{0.32}	    &  \heatcell{20.34}	        & \heatcell{12.72}	    & -	                & \heatcell{47.13}	    &  \heatcell{20.42}     & \heatcell{66.19}	        & \heatcell{4.24}   \\
+\cellcolor{gray!20} nonDecomposability	    	               &  \heatcell{33.27}	    &  \heatcell{0.31}	    &  \heatcell{18.26}	        & \heatcell{7.47}	    & \heatcell{45.80}	& -	                    &  \heatcell{14.97}     & \heatcell{59.20}	        & \heatcell{6.98}   \\
+\cellcolor{gray!20} answerableByEach	    	               &  \heatcell{21.43}	    &  \heatcell{0.12}	    &  \heatcell{8.89}	        & \heatcell{10.16}	    & \heatcell{55.11}	& \heatcell{41.58}	    &  -	                & - 	                    & -                 \\
+\cellcolor{gray!20} answerableByExactlyOne		               &  \heatcell{31.81}	    &  \heatcell{0.34}	    &  \heatcell{15.78}	        & \heatcell{6.74}	    & \heatcell{48.02}	& \heatcell{44.19}	    &  -                    & -	                        & -                 \\
+\cellcolor{gray!20} unanswerable	       	                    &  \heatcell{73.58}	    &  \heatcell{0.63}	    &  \heatcell{21.16}	        & \heatcell{2.21}	    & \heatcell{20.74}	& \heatcell{35.16}	    &  -                    & -	                        & -                 \\
+
+\end{tabular}%
+}
+\caption{conditional propability of co-failure. Rows denote the given failure, colums denote the conditional propability under that}
+\label{tab:conditional_co_failure}
+\end{table}
+
+
+\subsection{Dataset characteristics}
+
+
+% todo maybe find out what causes the first change (to few references, LLM opting out if possible?, no bridge?)
+Figure \ref{fig:dataset_category_distribution} shows the category distribution as well as its change during different stages of the dataset construction, including the initial random paper selection, approximating the distribution in the underlying corpus, gathering and similarity filtering of cited references as well as the filtering imposed by both the Quality-assurance metrics and the DIRE filter. 
+While the underlying corpus has categories assigned to individual papers, the following distributions must be interpreted on paper pairs instead, due to the intended multihop character of the questions. Therefore a "Interdisciplinary" category is introduced, if both papers don't share the same category.
+
+The observed shifts in percentage share indicate that the pipeline introduces a category-dependent bias, with differing effects across both categories and stages. While Physics is favored by the generation pipeline, increasing its share in both stages, Mathematics and Other get drastically reduced, as compared to the corpus distribution. Both Computer Science as well as Interdisciplinary questions are not as affected, buth lose a bit of share due to the Quality-assurance and DIRE filter.
+
+
+
+
+\begin{figure}[H]
+    \raggedright
+    \makebox[\textwidth][l]{%
+    \begin{tikzpicture}
+        \begin{axis}[
+            xbar,
+            width=0.78\textwidth,
+            height=10cm,
+            xmin=0,
+            xmax=100,
+            xlabel={in \%},
+            xtick={0,25,50,75,100},
+            scaled x ticks=false,
+            axis x line*=bottom,
+            axis y line*=left,
+            ytick={1,2,3,4,5},
+            axis line style={draw=black},
+            yticklabels={
+                Physics,
+                Computer Science,
+                Mathematics,
+                Interdisciplinary,
+                Other
+            },
+            y dir=reverse,
+            yticklabel style={font=\small, text width=4cm, align=left, anchor=north east, yshift=0.7em},
+            % nodes near coords={\pgfmathprintnumber[fixed,precision=0]{\pgfplotspointmeta}},
+            nodes near coords={\pgfmathprintnumber[fixed,precision=2]{\pgfplotspointmeta}\%},
+            point meta=x,
+            nodes near coords align={horizontal},
+            bar width=4pt,
+            enlarge y limits=0.12,
+            grid=major,
+            major grid style={draw=gray},
+            legend entries={ 
+                approximate share in unarxive 2022 dataset \textsuperscript{\ref{fn:unarxive-share}} (\%),
+                Share in the unfiltered dataset (\%), 
+                Share in filtered dataset (\%) 
+            }, 
+            legend style={
+                at={(0,-0.35)}, 
+                anchor=south west, 
+                font=\small, 
+                draw=black, 
+                fill=white,
+                align=left,
+                cells={anchor=west}
+            },
+        ]
+
+                    \addplot[
+                draw=gray!70!black,
+                fill=gray!35,
+                bar shift=12pt
+            ] coordinates {
+                % (61.22,1)
+                % (22.55,2)
+                % (4.76,3)
+                % (10.17,4)
+                % (1.30,5)
+                (51.97,1)
+                (21.06,2)
+                (21.13,3)
+                (5.84,5)
+            };
+            \addplot[
+                draw=blue!70!black,
+                fill=blue!35,
+                bar shift=0pt
+            ] coordinates {
+                (61.22,1)
+                (22.55,2)
+                (4.76,3)
+                (10.17,4)
+                (1.30,5)
+            };
+            \addplot[
+    draw=ForestGreen!70!black,
+    fill=ForestGreen!35,
+    bar shift=-12pt,
+    % nodes near coords={%
+    %     \pgfmathfloattofixed{\pgfplotspointmeta}%
+    %     \let\value\pgfmathresult
+    %     \ifdim \value pt>0pt
+    %         +%
+    %     \fi
+    %     \pgfmathprintnumber[fixed,precision=2]{\value}\%
+    % },
+    nodes near coords align={horizontal}
+    ] coordinates {
+        (64.89,1)
+        (18.72,2)
+        (6.60,3)
+        (8.94,4)
+        (0.85,5)    
+    };
+\end{axis}
+    \end{tikzpicture}%
+    }
+
+    \caption{Dataset category distribution}
+    \label{fig:dataset_category_distribution}
+\end{figure}
+\footnotetext{\label{fn:unarxive-share}%
+category distribution is approximated by sampling the categories of all randomly selected papers tried for generation}
+
+% TODO this data would suggest that for example as math is less punished by the pipeline that therefore there should be more math increase than cs (but math is heavily reduced instead) --> so there must an additional layer in between to the unfiltered dataset, that leads to this result
+% errors during generation by category
+A paper is considered eligible for question generation if it has 1) at least four cited references that are also part of the underlying corpus and 2) at least four of those references are inside the the cosine similarity threshold of being greater than 0.7 to ensure overlap but less than 0.9 as to exclude duplicates. Figure \ref{fig:errors_during_generation} groups the failure cases by category. 
+With respect to the first criterion, Physics gets least affected, while all other categories fail to provide at least four cited references substantially more often, with the strongest failure rates emerging for Computer Science. 
+A possible explanation for this obversavation might be, that Physics has by far the largest share in the underlying corpus, therefore referenced papers are also more likely to be included, while scarcely represented categories, especially the consolidated "Other" with the second highest failure rate might be more prone to failure. Although both Computer Science and Mathematics have a substantial share in the corpus, these papers might not have their references included, leaving gaps in the citation graph, resulting in higher failures for those categories as well.
+This however, remains entirely hypothetical, since the analysis does not include in-depth analysis of category corpus share and corpus-contained reference availability.
+The second criterion, filtering by cosine-similarity, shows a more balanced distribution. Physics and Mathematics have slightly increased error rates, compared to the average, while both Computer Science and papers in the Other category seem to be less affected, providing similar papers about 7\% more often than the average. 
+
+Overall, Physics has the highest eligibility rate for further generation, 
+% cs should become less and math more according to graph 4.5. how much are eligible, but somehow its reversed. This can possibly be reconstructed by looking at the logs and reconstructing why each question failed at the LLM acutal generation stage (but this can be lots of work)
+
+\begin{figure}[H]
+    \raggedright
+    \makebox[\textwidth][l]{%
+    \begin{tikzpicture}
+        \begin{axis}[
+            xbar,
+            width=0.78\textwidth,
+            height=12cm,
+            xmin=0,
+            xmax=100,
+            xlabel={in \%},
+            xtick={0,25,50,75,100},
+            scaled x ticks=false,
+            axis x line*=bottom,
+            axis y line*=left,
+            ytick={1,2,3},
+            axis line style={draw=black},
+            yticklabels={
+                not enough references (min. 4),
+                not enough references in cosine similarity threshold (min 4),
+                eligible for generation
+                },
+            y dir=reverse,
+            yticklabel style={font=\small, text width=4cm, align=left, anchor=north east, yshift=0.7em},
+            % nodes near coords={\pgfmathprintnumber[fixed,precision=0]{\pgfplotspointmeta}},
+            nodes near coords={\pgfmathprintnumber[fixed,precision=2]{\pgfplotspointmeta}\%},
+            point meta=x,
+            nodes near coords align={horizontal},
+            bar width=4pt,
+            enlarge y limits=0.12,
+            grid=major,
+            major grid style={draw=gray},
+            legend entries={ 
+                Physics,
+                Computer Science,
+                Mathematics,
+                Other,
+                Average,
+            }, 
+            legend style={
+                at={(0.6,0.1)}, 
+                anchor=south west, 
+                font=\small, 
+                draw=black, 
+                fill=white,
+                align=left,
+                cells={anchor=west}
+            },
+        ]
+            \addplot[
+                draw=blue!70!black,
+                fill=blue!35,
+                bar shift=24pt
+            ] coordinates {
+                (30.38,1)
+                (41.29,2)
+                (28.32,3)
+            };
+            \addplot[
+                draw=ForestGreen!70!black,
+                fill=ForestGreen!35,
+                bar shift=12pt
+            ] coordinates {
+                (57.56,1)
+                (33.24,2)
+                (9.19,3)
+            };
+                        \addplot[
+                draw=gray!70!black,
+                fill=gray!35,
+                bar shift=0pt
+            ] coordinates {
+                (42.91,1)
+                (42.79,2)
+                (14.30,3)
+            };
+            \addplot[
+                draw=yellow!70!black,
+                fill=yellow!35,
+                bar shift=-12pt
+            ] coordinates {
+                (47.77,1)
+                (33.42,2)
+                (18.80,3)
+            };
+                        \addplot[
+                draw=red!70!black,
+                fill=red!35,
+                bar shift=-24pt
+            ] coordinates {
+                (37.76,1)
+                (40.05,2)
+                (22.19,3)
+            };
+
+
+        \end{axis}
+    \end{tikzpicture}%
+    }
+
+    \caption{cause of error during generation by paper category}
+    \label{fig:errors_during_generation}
+\end{figure}
+
+
+\newcommand{\heatcellByCategory}[1]{%
+    \begingroup
+    \pgfmathsetmacro{\cellvalue}{#1}%
+    % 0 -> no color; absolute value 10 or greater -> full intensity
+    \pgfmathtruncatemacro{\intensity}{%
+        min(100,max(0,round(10*abs(\cellvalue))))%
+    }%
+
+    \ifdim\cellvalue pt<0pt
+        \edef\x{\endgroup
+            \noexpand\cellcolor{ForestGreen!\intensity!white}%
+        }%
+    \else
+        \ifdim\cellvalue pt>0pt
+            \edef\x{\endgroup
+                \noexpand\cellcolor{Red!\intensity!white}%
+            }%
+        \else
+            \edef\x{\endgroup
+                \noexpand\cellcolor{white}%
+            }%
+        \fi
+    \fi
+
+    \x
+    \makebox[1.2cm][r]{#1\%}%
+}
+
+Table \ref{tab:affection_by_category} shows the deviation of category specific judgements from both the quality assurance metrics as well as the DIRE filter. Although the total rejection rate varies only slightly, categories are affected differently by certain parts of the filter.    
+% heatmap for showing which categories are stronger affected
+\begin{table}[H]
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llccccc}
+\cellcolor{gray!20}overall&  
+% \cellcolor{gray!20}\rotatebox{90}{total for this category} & 
+\cellcolor{gray!20}                & 	
+\cellcolor{gray!20}{Physics}                &
+\cellcolor{gray!20}{Computer Science}                     &
+\cellcolor{gray!20}{Mathematics}                   &
+\cellcolor{gray!20}{Interdisciplinary}      &
+\cellcolor{gray!20}{Other} \\
+\hline
+\cellcolor{gray!20} 82,06\%        & \cellcolor{gray!20}{\textbf{bad Judgement}}            &\heatcellByCategory{-0.12}  &	\heatcellByCategory{1.47}    &	\heatcellByCategory{-4.20}          & 	\heatcellByCategory{0.12}   &	\heatcellByCategory{-5.35} \\
+\hline
+\cellcolor{gray!20}41,48\%	       & \cellcolor{gray!20}{multiHopValidity}                  &  \heatcellByCategory{3.22}	    &  \heatcellByCategory{-5.85}	&  \heatcellByCategory{-3.21}   & \heatcellByCategory{-4.25}    &   \heatcellByCategory{-5.18  } \\
+\cellcolor{gray!20}16,15\%	       & \cellcolor{gray!20}{dependencyStrength}                &  \heatcellByCategory{-0.14}	    &  \heatcellByCategory{1.71	}   &  \heatcellByCategory{-1.51}   & \heatcellByCategory{-2.28}    &   \heatcellByCategory{0.29   } \\
+\cellcolor{gray!20}42,68\%	       & \cellcolor{gray!20}{nonDecomposability}                &  \heatcellByCategory{-0.43}	    &  \heatcellByCategory{2.17	}   &  \heatcellByCategory{0.09	}   & \heatcellByCategory{-1.16	}   &   \heatcellByCategory{-8.44  } \\
+\cellcolor{gray!20}5,86\%	       & \cellcolor{gray!20}{evidenceDistribution}              &  \heatcellByCategory{0.37}	    &  \heatcellByCategory{-1.07}	&  \heatcellByCategory{0.90}    & \heatcellByCategory{-0.32	}   &   \heatcellByCategory{0.31   } \\
+\cellcolor{gray!20}36,02\%         & \cellcolor{gray!20}{answerability}                     &  \heatcellByCategory{-2.98}	    &  \heatcellByCategory{6.54	}   &  \heatcellByCategory{-4.31}   & \heatcellByCategory{5.25	}   &   \heatcellByCategory{1.65   } \\
+\cellcolor{gray!20}0,33\%	       & \cellcolor{gray!20}{decontextualization}               &  \heatcellByCategory{-0.01}	    &  \heatcellByCategory{-0.01}	&  \heatcellByCategory{0.23}    & \heatcellByCategory{0.02	}   &   \heatcellByCategory{-0.33  } \\
+\\
+\hline
+
+\cellcolor{gray!20}81,03\%         & \cellcolor{gray!20}{\textbf{bad DIRE}}                 & \heatcellByCategory{0.25}         &	\heatcellByCategory{-0.27}  &	\heatcellByCategory{-4.48}  &\heatcellByCategory{	0.62}   &	\heatcellByCategory{4.58} \\
+\hline
+\cellcolor{gray!20}8,48\%	       & \cellcolor{gray!20}{unanswerableByPapers}              &  \heatcellByCategory{-0.53}	    &  \heatcellByCategory{0.86	}   &  \heatcellByCategory{-0.22}   & \heatcellByCategory{0.74	}   &   \heatcellByCategory{5.22   } \\
+\cellcolor{gray!20}15,37\%	       & \cellcolor{gray!20}{answerableByEachPaperIndividually} &  \heatcellByCategory{1.16}	    &  \heatcellByCategory{-2.62}	&  \heatcellByCategory{0.76}    & \heatcellByCategory{-1.15	}   &   \heatcellByCategory{-3.04  } \\
+\cellcolor{gray!20}57,18\%	       & \cellcolor{gray!20}{answerableEitherAorB}              &  \heatcellByCategory{-0.38}	    &  \heatcellByCategory{1.49	}   &  \heatcellByCategory{-5.02}   & \heatcellByCategory{1.03	}   &   \heatcellByCategory{2.41   } \\
+\\
+\hline
+\cellcolor{gray!20}95,80\%         & \cellcolor{gray!20}{\textbf{bad total}}    	        &  \heatcellByCategory{-0.25}       &   \heatcellByCategory{0.71}   &   \heatcellByCategory{-1.62}  &   \heatcellByCategory{0.51}   &	\heatcellByCategory{1.46} \\
+
+\end{tabular}%
+}
+\caption{deviation of the failure categories relative to the average. Negative values denote less failures, positive values indicate increased failure rates}
+\label{tab:affection_by_category}
+\end{table}
+
+
+
+% manual  validation
+% TODO mention that validation is restricted to CS
+\subsection{Manual validation}
+In order to validate the robustness of the automatic filtering process, a randomly selected sample of 50 computer science questions out of the 470 retained question-answer pairs as well as their filtering results were manually inspected. Caused by the unavailability of domain expertise, the restriction to computer science poses a limitation for generalizing the evaluation results across different fields of study, however, the high manual agreement within this subset suggests, that the filtering pipeline could show similar performance elsewhere.
+Since this analysis is limited to positive QA-pairs, its effectively measuring filtering pipeline precision rather then recall by conducting manual evaluation on both the quality-assurance crieria, as well as the DIRE filter. The results show high agreement rates from 90\% to 96\% on individual quality-assurance criteria, while simultanious agreement on all is measured at 82\%.
+Analysis of the DIRE filter produces even higher agreement rates, with all three instances of missaligned judgements being, that the question is answerable by using one paper only.
+Overall the manual validation shows 82\% agreement with the automatic filtering pipeline, showcasing, that even with its restrictive character a smaller amount of noise remains present in the dataset.
+\begin{figure}[H]
+    \raggedright
+    \makebox[\textwidth][l]{%
+    \begin{tikzpicture}
+        \begin{axis}[
+            xbar,
+            width=0.75\textwidth,
+            height=8cm,
+            xmin=0,
+            xmax=100,
+            xlabel={percentage of agreement with automatic evaluation on positive CS examples},
+            xtick={0,50,100},
+            scaled x ticks=false,
+            axis x line*=bottom,
+            axis y line*=left,
+            ytick={1,2,3,4,5,6,7,8,9,10,11,12,13,14},
+            axis line style={draw=black},
+            yticklabels={
+                {\textbf{Agreement on all QA criteria}},
+                \hspace{1em} Non-Decomposability, 
+                \hspace{1em} Multi-Hop validity, 
+                \hspace{1em} Answerability,
+                \hspace{1em} Dependency strength,
+                \hspace{1em} Evidence distribution,
+                \hspace{1em} Decontextualization,
+                {\textbf{DIRE}},
+                {\textbf{Total}},
+            },
+            y dir=reverse,
+            yticklabel style={font=\small, text width=5.5cm, align=left, anchor=north east, yshift=0.7em},
+            point meta=x,
+            nodes near coords={\pgfmathprintnumber[fixed,precision=0]{\pgfplotspointmeta}\%},
+            nodes near coords align={horizontal},
+            enlarge y limits=0.12,
+            grid=major,
+            major grid style={draw=gray},
+        ]
+            \addplot[
+                bar width=8pt,
+                draw=ForestGreen!70!black,
+                fill=ForestGreen!35,
+                bar shift=0pt
+            ] coordinates {
+                (82,1)
+                (94,8)    
+                (82,9)
+            };
+            \addplot[
+                bar width=4pt,
+                draw=red!70!black,
+                fill=red!35,
+                bar shift=0pt
+            ] coordinates {
+                (90,2)
+                (90,3)    
+                (96,4)
+                (90,5)
+                (90,6)
+                (94,7)
+            };
+        \end{axis}
+    \end{tikzpicture}%
+    }
+
+    \caption{Manual validation}
+\end{figure}
+
+% todo show question example
+% mmmh maybe like this
+
+%TODO what to analyze
+%gold document recall@10 - measure before adaptive filtering
+% recall filtered (thats what the current thing is)
+% gold retention rate
+
+\section{Retrieval Performance}
+With the RAG approach, both question answering and cited text span extraction are inherently constrained by the performance of the underlying retrieval component. Figure \ref{fig:gold_paper_retrieval_by_category} shows the retrieval recall of the SQuAI system on the proposed dataset by category. Across all those, on average, the system retrieves 0.63 (31.7\%) of the two ground-truth papers used for question generation. Computer Science once again shows a negative outlier, with an increase of 10 percentage points in cases where none of the ground-truth papers could be retrieved. Together with questions from the Interdisciplinary category it has the lowest recall on ground truth papers across the dataset. Mathematics and Interdisciplinary questions show the highest partial retrieval, with a slight increase in cases where one of the two ground truth papers could be retrieved, in comparison with the overall distribution.  
+The strongest deviation is observed for the Other category, however due to low sample size, it represents a statistical outlier rather than an indication of superior retrieval performance. 
+
+% -retrievel capabiliy of the system (how often it find the exact the 2 gold ground truth papers)
+% -average length of the extracted span? by method?
+% analyze the answer?
+
+
+\pgfplotsset{compat=1.18}
+
+\begin{figure}[H]
+    \raggedright
+    \makebox[\textwidth][l]{%
+    \begin{tikzpicture}
+        \begin{axis}[
+            xbar stacked,
+            width=0.82\textwidth,
+            height=11cm,
+            xmin=0,
+            xmax=100,
+            xlabel={share of questions within category (\%)},
+            xtick={0,25,50,75,100},
+            scaled x ticks=false,
+            axis x line*=bottom,
+            axis y line*=left,
+            axis line style={draw=black},
+            ytick={1,2,3,4,5,6},
+            yticklabels={
+                Overall \hfill ($n=470$),
+                Physics \hfill ($n=305$),
+                Computer Science \hfill ($n=88$),
+                Mathematics         \hfill ($n=31$),
+                Interdisciplinary   \hfill ($n=42$),
+                Other               \hfill ($n=4$)
+            },
+            y dir=reverse,
+            yticklabel style={
+                font=\small,
+                text width=4.5cm,
+                align=left,
+                anchor=east
+            },
+            bar width=15pt,
+            enlarge y limits=0.10,
+            xmajorgrids=true,
+            major grid style={draw=gray!40},
+            legend style={
+                at={(0,-0.28)},
+                anchor=south west,
+                font=\small,
+                draw=black,
+                fill=white,
+                align=left,
+                cells={anchor=west}
+            },
+            clip=false,
+            after end axis/.code={
+    % Overall
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:23.935,1) {47.87\%};
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:68.295,1) {40.85\%};
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:94.360,1) {11.28\%};
+    % Physics
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:23.280,2) {46.56\%};
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:67.050,2) {40.98\%};
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:93.770,2) {12.46\%};
+    % Computer Science
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:28.975,3) {57.95\%};
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:74.995,3) {34.09\%};
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:96.025,3) {7.95\%};
+    % Mathematics
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:19.355,4) {38.71\%};
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:64.515,4) {51.61\%};
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:95.160,4) {9.68\%};
+    % Interdisciplinary
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:22.620,5) {45.24\%};
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:69.050,5) {47.62\%};
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:96.430,5) {7.14\%};
+    % Other
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:12.500,6) {25.00\%};
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:37.500,6) {25.00\%};
+    \node[font=\scriptsize,anchor=center,inner sep=0pt]
+        at (axis cs:75.000,6) {50.00\%};
+},
+        ]
+
+        % ----------------------------------------------------------
+        % No gold paper retrieved
+        % ----------------------------------------------------------
+        \addplot[
+            draw=red!50!black,
+            fill=red!35,
+            % point meta=x,
+            % nodes near coords={
+            %     \pgfmathprintnumber[
+            %         fixed,
+            %         precision=1
+            %     ]{\pgfplotspointmeta}\%
+            % },
+            % every node near coord/.append style={
+            %     font=\scriptsize,
+            %     text=black,
+            %     anchor=east,
+            %     xshift=-2pt
+            % }
+        ] coordinates {
+            (47.87,1)
+            (46.56,2)
+            (57.95,3)
+            (38.71,4)
+            (45.24,5)
+            (25.00,6)
+        };
+        \addlegendentry{No gold paper retrieved}
+
+        % ----------------------------------------------------------
+        % Exactly one gold paper retrieved
+        % ----------------------------------------------------------
+        \addplot[
+            draw=yellow!50!black,
+            fill=yellow!35,
+            % point meta=explicit,
+            % nodes near coords={
+            %     \pgfmathprintnumber[
+            %         fixed,
+            %         precision=1
+            %     ]{\pgfplotspointmeta}\%
+            % },
+            % every node near coord/.append style={
+            %     font=\scriptsize,
+            %     text=black,
+            %     anchor=east,
+            %     xshift=-2pt
+            % }
+        ] coordinates {
+            (40.85,1) 
+            (40.98,2) 
+            (34.09,3) 
+            (51.61,4) 
+            (47.62,5) 
+            (25.00,6) 
+        };
+        \addlegendentry{One gold paper retrieved}
+
+        % ----------------------------------------------------------
+        % Both gold papers retrieved
+        % ----------------------------------------------------------
+        \addplot[
+            draw=ForestGreen!50!black,
+            fill=ForestGreen!35,
+            % point meta=explicit,
+            % nodes near coords={
+            %     \pgfmathprintnumber[
+            %         fixed,
+            %         precision=1
+            %     ]{\pgfplotspointmeta}\%
+            % },
+            % every node near coord/.append style={
+            %     font=\scriptsize,
+            %     text=black,
+            %     anchor=east,
+            %     xshift=-2pt
+            % }
+        ] coordinates {
+            (11.28,1)   
+            (12.46,2)   
+            (7.95,3)    
+            (9.68,4)    
+            (7.14,5)    
+            (50.00,6)   
+        };
+        \addlegendentry{Both gold papers retrieved}
+        \end{axis}
+        
+    \end{tikzpicture}%
+    }
+
+    \caption{
+     Retrieved gold-ground-truth documents by category
+    }
+    \label{fig:gold_paper_retrieval_by_category}
+\end{figure}
 \section{System evaluation}
-
 
 % limitations
 % multiple claims per sentence that need backing
 % unconnected span in the source paper for attribution
+
+
+
+
+
 

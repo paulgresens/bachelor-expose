@@ -1059,50 +1059,8 @@
       \strng{authornamehash}{7dc537af75ae705c412386c3e0b7f69f}
       \strng{authorfullhash}{7dc537af75ae705c412386c3e0b7f69f}
       \strng{authorfullhashraw}{7dc537af75ae705c412386c3e0b7f69f}
-      \field{extraname}{1}
       \field{sortinit}{1}
       \field{sortinithash}{4f6aaa89bab872aa0999fec09ff8e98a}
-      \field{labelnamesource}{author}
-      \field{labeltitlesource}{title}
-      \field{isbn}{978-3-031-96261-5}
-      \field{month}{07}
-      \field{title}{Citation Context Extraction Using a Transformer-Based Model with a Question-Answering Task}
-      \field{year}{2025}
-      \field{pages}{293\bibrangedash 306}
-      \range{pages}{14}
-      \verb{doi}
-      \verb 10.1007/978-3-031-96262-2_19
-      \endverb
-    \endentry
-    \entry{citationContextExtractionUsingATransformerBasedModel}{inbook}{}{}
-      \name{author}{3}{}{%
-        {{hash=1d6316b0a65984b647a69414feedef3e}{%
-           family={Khanyi},
-           familyi={K\bibinitperiod},
-           given={Masana},
-           giveni={M\bibinitperiod}}}%
-        {{hash=fd044289133fc162df52b66c9676fab8}{%
-           family={Lill},
-           familyi={L\bibinitperiod},
-           given={Milandre},
-           giveni={M\bibinitperiod}}}%
-        {{hash=c5f0586062dc5fafb5307c91946d671e}{%
-           family={Dunaiski},
-           familyi={D\bibinitperiod},
-           given={Marcel},
-           giveni={M\bibinitperiod}}}%
-      }
-      \strng{namehash}{7dc537af75ae705c412386c3e0b7f69f}
-      \strng{fullhash}{7dc537af75ae705c412386c3e0b7f69f}
-      \strng{fullhashraw}{7dc537af75ae705c412386c3e0b7f69f}
-      \strng{bibnamehash}{7dc537af75ae705c412386c3e0b7f69f}
-      \strng{authorbibnamehash}{7dc537af75ae705c412386c3e0b7f69f}
-      \strng{authornamehash}{7dc537af75ae705c412386c3e0b7f69f}
-      \strng{authorfullhash}{7dc537af75ae705c412386c3e0b7f69f}
-      \strng{authorfullhashraw}{7dc537af75ae705c412386c3e0b7f69f}
-      \field{extraname}{2}
-      \field{sortinit}{2}
-      \field{sortinithash}{8b555b3791beccb63322c22f3320aa9a}
       \field{labelnamesource}{author}
       \field{labeltitlesource}{title}
       \field{isbn}{978-3-031-96261-5}
@@ -2958,6 +2916,50 @@
       \verb https://arxiv.org/abs/2601.15300
       \endverb
     \endentry
+    \entry{howLongIsAPieceOfString}{misc}{}{}
+      \name{author}{3}{}{%
+        {{hash=65b931b85958ad179656a050cf28cf72}{%
+           family={Roberts},
+           familyi={R\bibinitperiod},
+           given={Jonathan},
+           giveni={J\bibinitperiod}}}%
+        {{hash=735173e7254986d180bcb08fbac4266c}{%
+           family={Han},
+           familyi={H\bibinitperiod},
+           given={Kai},
+           giveni={K\bibinitperiod}}}%
+        {{hash=16b5c328bb82309153fe2dcf34adf4f0}{%
+           family={Albanie},
+           familyi={A\bibinitperiod},
+           given={Samuel},
+           giveni={S\bibinitperiod}}}%
+      }
+      \strng{namehash}{ed8f6ed7f5b65b6b4426c133a7cdca3f}
+      \strng{fullhash}{ed8f6ed7f5b65b6b4426c133a7cdca3f}
+      \strng{fullhashraw}{ed8f6ed7f5b65b6b4426c133a7cdca3f}
+      \strng{bibnamehash}{ed8f6ed7f5b65b6b4426c133a7cdca3f}
+      \strng{authorbibnamehash}{ed8f6ed7f5b65b6b4426c133a7cdca3f}
+      \strng{authornamehash}{ed8f6ed7f5b65b6b4426c133a7cdca3f}
+      \strng{authorfullhash}{ed8f6ed7f5b65b6b4426c133a7cdca3f}
+      \strng{authorfullhashraw}{ed8f6ed7f5b65b6b4426c133a7cdca3f}
+      \field{sortinit}{5}
+      \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{eprintclass}{cs.CL}
+      \field{eprinttype}{arXiv}
+      \field{title}{How Long Is a Piece of String? A Brief Empirical Analysis of Tokenizers}
+      \field{year}{2026}
+      \verb{eprint}
+      \verb 2601.11518
+      \endverb
+      \verb{urlraw}
+      \verb https://arxiv.org/abs/2601.11518
+      \endverb
+      \verb{url}
+      \verb https://arxiv.org/abs/2601.11518
+      \endverb
+    \endentry
     \entry{gptoss120B}{misc}{}{}
       \field{sortinit}{5}
       \field{sortinithash}{20e9b4b0b173788c5dace24730f47d8c}
@@ -3053,6 +3055,7 @@
       \endverb
     \endentry
   \enddatalist
+  \missing{citationContextExtractionUsingATransformerBasedModel}
 \endrefsection
 \endinput
 

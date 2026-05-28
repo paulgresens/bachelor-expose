@@ -16,23 +16,44 @@ Your task is to select the best pair of papers and generate ONE question that re
 PAPER SELECTION
 First, select the best pair of papers.
 The selected pair must satisfy:
--Paper A provides an intermediate entity, method, dataset, variable, or result
--Paper B uses, evaluates, extends, contrasts with, explains, or depends on that intermediate element
+
+-Paper A must provide more than a named entity. It must provide an operational meaning, condition, mechanism, definition, directionality, limitation, assumption, guarantee, interpretation, failure mode, objective, result or similar that is needed to interpret Paper B.
+-Paper B must provide a concrete use case, measurement, experiment, result, comparison, design choice, observation, conclusion or similar whose meaning depends on the information from Paper A.
+-Paper A must provide an intermediate proposition about an entity, method, dataset, variable, result, or concept, not merely the name of that entity.
+-Paper B must require applying that proposition, not merely recognizing that the same entity is used again.
+
+-A question is invalid if Paper A is only used to identify the name of a method, metric, model, dataset or similar that Paper B already mentions, so you cannot just describe the selected entity loosely and ask for identification or naming of it.
+The final answer must not be only the name of a method, metric, dataset, model, or concept. It must be an explanation, conclusion, comparison, interpretation, or derived statement that depends on combining both papers.
 -The final answer requires combining both papers
 -Do NOT select papers that are only loosely related or redundant.
+
+Do not generate questions whose reasoning type is only:
+-entity linking,
+-artifact reuse,
+-citation tracing,
+-numeric lookup,
+-table lookup,
+-independent comparison,
+-descriptive clue matching.
 
 REQUIREMENTS
 A valid question MUST: 
 -require exactly two reasoning steps (2-hop)
 -use exactly two supporting papers
 -require sequential reasoning:
-    -Step 2 must depend on the result of Step 1
-    -If Step 1 is removed, Step 2 should not be solvable
+    -Step 1 must derive a proposition from Paper A, not merely identify a named entity, metric, model, dataset or benchmark. Instead it should derive an interpretable proposition from Paper A such as a mechanism, condition, limitation, guarantee, assumption, theoretical relation, or failure mode.
+    -Step 2 must apply the proposition from Step 1 to interpret a concrete result, design choice, experiment, observation, or conclusion from Paper B.
+    -Step 2 must not be solvable by reading Paper B alone, even if Paper B mentions the same method, metric, model, dataset, benchmark, architecture, or loss function. Thus Paper A must be strictly required to answer the question.
+    -If the answer can be produced by first identifying an artifact from Paper A and then looking up how Paper B uses that artifact, the question is invalid.
 -NOT be answerable from either paper alone
 -be self-contained and unambiguous
 -require combining information across both papers
+-A valid question must require real reasoning rather than entity linking. The answer must depend on applying a proposition from Paper A to interpret evidence from Paper B, not merely identifying a named artifact or matching similar wording across papers.
 -only use information that is present in the papers, do not invent hypothetical connections or applications. Only use existing connections.
+-The question may mention the concept from Paper A, but it must not state the full intermediate conclusion from Paper A as an already-given premise. The respondent should still need Paper A to derive or justify Step 1.
 -question cannot contain explicit references to the papers or its content such as "in this paper", "the proposed methods" or similar
+-The question may use necessary technical terminology from the papers, but it should not copy distinctive phrasing from either paper unless the phrase is a standard technical term. Rephrase the evidence into a reasoning-focused question.
+
 
 AVOID
 Do NOT generate:
@@ -41,7 +62,17 @@ Do NOT generate:
 -literature summary questions
 -questions answerable from a single paper
 -questions where papers are only topically related but not logically connected
+-questions where Paper A only introduces an artifact and Paper B merely reuses, applies, evaluates, compares against, cites, or optimizes that artifact or where the answer is just the artifact itself or a verbatim description of it
+-questions where the two steps are independent facts that can be answered separately and simply concatenated
+-questions where Step 1 can be solved mainly by matching a distinctive phrase in the question to nearly identical wording in Paper A
+
 -Do NOT use external scientific knowledge, commonsense assumptions, or unstated domain knowledge, only use the information that is present in the papers
+
+Invalid:
+Paper A defines method X. Paper B uses method X.
+Paper A introduces dataset X. Paper B evaluates on X.
+Paper A introduces metric X. Paper B reports metric X.
+Paper A describes architecture X. Paper B applies X.
 
 OUTPUT FORMAT
 {
@@ -57,121 +88,511 @@ OUTPUT FORMAT
     ],
     "rejectedPapers": [<paperId1>, <paperId2>, <paperId3>],
     "reasoning": {
+        "bridgeProposition": <the interpretable proposition derived from Paper A, such as a mechanism, condition, limitation, guarantee, theoretical relation, or failure mode; this must not be merely a named artifact>,
+        "paperBObservation": <the concrete result, design choice, experiment, observation, or conclusion from Paper B that requires interpretation>,
+        "appliedInference": <explain the connection>,
         "step1": <Explain your reasoning for step1 on paper A>,
         "step2": <use step1 reasoning to derive or support the final answer>,
-        "connectionExplanation": <explain why the steps are connected and why step2 requires the result of step1>,
-    }, 
-    "questionDraft" : "<one clear, self-contained question requiring 2-hop reasoning, this serves as a draft for you final question. You can but don't have to explicitely reference the papers here to help formulate a better question.>",
+        "connectionExplanation": <explain why Step 2 cannot be solved without Step 1, and why this is not entity linking, artifact reuse, table lookup, numeric lookup, or lexical matching>
+        },
+    "questionDraft" : "<one clear, self-contained question requiring 2-hop reasoning, this serves as a draft for you final question. You can but don't have to explicitly reference the papers here to help formulate a better question.>",
     "question" : <decontextualize the questionDraft, so that it contains no explicit reference to the papers or external figures. Every reference to a paper should instead directly name the concept, phenomenon, method or similar that you are referring to, briefly describing it if needed. The question cannot contain explicit references to the papers or its content such as "in this paper", "the proposed methods" or similar.>",
     "answerWithPaperReferences" : <long-form paragraph integrating Paper A and Paper B with citations like [Paper A], [Paper B]>,
-    "answerWithoutPaperReferences": <long-form paragraph that answers the question, without referencing the papers, but directly incorporatestheir information, so that it is standalone understandable>,
-    "isNotSingleHop": <explain why the question you generated is not single hop>
+    "answerWithoutPaperReferences": <long-form paragraph that answers the question, without referencing the papers, but directly incorporates their information, so that it is standalone understandable>,
+    "isNotSingleHop": <explain why neither Paper A nor Paper B alone can answer the question, why Step 2 requires applying the proposition from Step 1, and why the question is not merely artifact reuse, entity linking, or lexical matching>
 }
 
-Do not deviate from this schema. Do not add any preciding information like ```json. Only Answer with the valid json
+If no valid question can be generated, answer only with the exact string "NO_QUESTION_GENERATABLE".
+If a valid question can be generated, answer only with the valid JSON object. You are not allowed to deviate from  this schema. Do not add any preceding information like ```json. Only Answer with the valid json.
+
 Paper Texts:
+
 \end{lstlisting}
 
+\begin{lstlisting}[caption={Multihop-Validity Prompt}, label={lst:MultihopValidityPrompt}]
+You are evaluating a scientific question-answer (Q-A) example. You are given a generated question, an answer and two paper texts. Your goal is to judge how well this generated question fullfills a criterion.
 
-\begin{lstlisting}[caption={Dataset Generation Judgement prompt}, label={lst:Dataset Generation Judgement prompt}]
-You are evaluating a scientific question-answer (Q-A) example.
-Your goal is to assess whether it is a valid 2-hop, evidence-grounded scientific multi-hop question.
-A valid example must:
--require combining information from exactly TWO papers
--involve dependent reasoning (Step 2 must require Step 1)
--not be decomposable into independent sub-questions
--be fully answerable from the provided evidence
--be self-contained and unambiguous
+The criterion is:
+Multi-hop Validity: Does answering the question require combining the information from both papers?
 
-IMPORTANT:
--For each criterion, assign one label:
--GOOD = fully satisfies the criterion
--BORDERLINE = partially satisfies the criterion
--BAD = does not satisfy the criterion
--Be strict: only assign GOOD if the criterion is clearly and fully satisfied.
+1. Decompose the question into the necessary claims, that need to be answered in order to answer the whole question.
+2. For each required claim, identify which papers answers it:
+   -already stated in the question,
+   -answerable only by Paper 1,
+   -answerable only by Paper 2,
+   -answerable by both papers,
+   -unsupported or inferred.
+3. Test whether either paper alone is sufficient:
+   Could Paper 1 alone answer the complete question?
+   Could Paper 2 alone answer the complete question?
+4. Test whether question leakage makes one paper unnecessary:
+   Does the question already state the main fact, mechanism, definition, objective, result, or condition that one paper is supposed to contribute?
+   Could the other paper plus the information already stated in the question answer the main question?
+
+5. Check whether both papers provide non-redundant required information:
+   If one paper only identifies, introduces, defines, or names an artifact that the other paper already properly introduces, uses, mentions, evaluates, optimizes, cites, or compares against, this is not enough for GOOD. However, a good judgement here can be possible, if the other paper adds a non-trivial proposition about that artifact, required for interpreting, analyzing, applying or justifying or similar.
+6. Distinguish the main answer from optional elaboration.
+   Ask whether both papers are required for the central answer, not just for a richer or more detailed answer. If one paper answers the main question and the other only adds nuance, background, or a fuller mechanism, assign BORDERLINE rather than GOOD.
+
+Finally, based on the previous steps, give a final judgement wether the question truly is multihop- valid.
+JUDGEMENT OPTIONS:
+-GOOD: Both papers are strictly required; neither paper alone provides enough information to answer the complete question.
+-BORDERLINE: Both papers contribute, but one paper may be sufficient to answer the main question, or the second paper mainly adds background/context.
+-BAD: Only one paper is sufficient; the question is effectively single-hop.
+Important: If one paper only identifies, introduces, defines, or names an artifact that the other paper already uses, mentions, evaluates, optimizes, cites, or compares against, this is not enough for GOOD. The answer must require combining non-redundant evidence from both papers.
 
 INPUT:
-Question: {question} 
-Answer: {answer} 
+Question: {question}
+Answer: {answer}
 bridgeEvidencePaperText: {paper1Text}
 bridgeAnswerPaperText: {paper2Text}
-Reasoning Steps: {reasoningSteps}
 
-EVALUATION CRITERIA
-A. Reasoning Structure
-Multi-hop Validity: Does answering the question require combining both papers?
-Assesses whether answering the question requires integrating information from both papers. Thus, this criterion is only satisfied, if neither paper provides sufficient information for deriving the complete answer.
--GOOD: Both papers are strictly required, the question cannot be answered using only one paper
--BORDERLINE: Both papers contribute but one may be sufficient
--BAD: Only one paper is sufficient (single-hop)
-
-Dependency Strength: 
-evaluates whether the steps in the reasoning chain are sequentially dependent, in order for the conclusion to be drawn. Thus, the second reasoning step cannot be solved without first applying or interpreting the first one.
-Step 2 must require the result, entity, method, dataset, variable, or conclusion obtained in Step 1.
-GOOD: Step 2 strictly requires Step 1
-BORDERLINE: Partial dependence
-BAD: Steps are independent (disconnected reasoning)
-
-Non-Decomposability: Is the question NOT decomposable into independent sub-questions?
-Verifies that questions cannot be broken down into independent single-hop sub-questions. Instead, reasoning steps must be connected in such a way, that separately solving them would not be sufficient for deriving an answer.
--GOOD: Cannot be split; requires joint reasoning
--BORDERLINE: Partially decomposable
--BAD: Clearly decomposable into independent sub-questions
-
-B. Evidence Grounding
-Evidence Distribution: Are both papers required and non-redundant?
-Examines whether both papers contribute distinct and necessary evidence, ensuring that required evidence is spread across both papers and questions cannot be answered by using a single dominant source, with redundant information.
--GOOD: Each paper contributes distinct, necessary information
--BORDERLINE: Some overlap or redundancy
--BAD: One paper is sufficient; the other is redundant
-
-Answerability: Is the answer fully supported by the provided evidence?
-Assesses whether the answer is fully supported and obtainable by only relying on information present in the  papers, without requiring external knowledge or speculative inference, not explicitly supported by either paper. 
--GOOD: Fully supported by cited evidence
--BORDERLINE: Partially supported
--BAD: Not supported or contradicts the evidence
-
-C. Dataset Quality: 
-Decontextualization
-Is the question self-contained and unambiguous? The question cannot contain explicit references to the papers or its content such as "in this paper", "the proposed methods", " this approach" or similar.
--GOOD: Fully self-contained; all entities clearly defined
--BORDERLINE: Minor ambiguity
--BAD: Not understandable without external context
-
-OUTPUT FORMAT
+OUTPUT_FORMAT
 {{
-    "multiHopValidity": {{
-        "judgement": "<GOOD / BORDERLINE / BAD>",
-        "explanation": "<explain your judgement for multiHopValidity>"
-    }},
-    "dependencyStrength": {{
-        "judgement": "<GOOD / BORDERLINE / BAD>",
-        "explanation": "<explain your judgement for dependencyStrength>"
-    }},
-    "nonDecomposability": {{
-        "judgement": "<GOOD / BORDERLINE / BAD>",
-        "explanation": "<explain your judgement for nonDecomposability>"
-    }},
-    "evidenceDistribution": {{
-        "judgement":"<GOOD / BORDERLINE / BAD>",
-        "explanation": "<explain your judgement for evidenceDistribution>"
-
-    }},
-    "answerability": {{
-        "judgement": "<GOOD / BORDERLINE / BAD>",
-        "explanation": "<explain your judgement for answerability>"
-
-    }},
-    "decontextualization": {{
-        "judgement": "<GOOD / BORDERLINE / BAD>",
-        "explanation": "<explain your judgement for decontextualization>"
-
-    }},
-    "confidence": <0 to 1 rate how confident you are in the judgements>
+"thinking": {{
+"claims": [
+{{
+"claim": <The first claim you identifid>,
+"sourceSupportedBy": <question | paper1 | paper2 | both | unsupported_or_inferred>
+}},
+...
+],
+"paper1AloneSufficient": {{
+"judgement": <true | false>,
+"explanation": <explain why or why not paper 1 alone is sufficient for answering the question>
+}},
+"paper2AloneSufficient": {{
+"judgement": <true | false>,
+"explanation": <explain why or why not paper 2 alone is sufficient for answering the question>
+}},
+"paper1PlusQuestionSufficient": {{
+"judgement": <true | false>,
+"explanation": <explain why or why not paper 1 together with the information in the question is sufficient for answering the question>
+}},
+"paper2PlusQuestionSufficient": {{
+"judgement": <true | false>,
+"explanation": <explain why or why not paper 2 together with the information in the question is sufficient for answering the question>
+}},
+"questionLeakage": {{
+"present": <true | false>,
+"explanation": <explain why or why no question leakage is present>
+}},
+"redundancyOrArtifactOnly": {{
+"present": <true | false>,
+"explanation": <explain why or why not >
+}},
+"mainVsOptionalElaboration": {{
+"present": <true | false>,
+"explanation": <explain why or why not >
+}}
+}},
+"judgement": "<insert the final judgement, considering all previous evaluations here. Are both papers really required. Answer with: GOOD | BORDERLINE | BAD>",
+"explanation": "<thoroughly describe how good the question fulfills the multihop validity criteria and justify jour judgement based on previous evaluations>"
 }}
 
 Do not deviate from this schema. Do not add any preciding information like ```json. Only Answer with the valid json
+
 \end{lstlisting}
+
+\begin{lstlisting}[caption={Dependency Strength Prompt}, label={lst:DependencyStrengthPrompt}]
+    You are evaluating a scientific question-answer (Q-A) example. You are given a generated question, an answer, reasoning as well as two paper texts. Your goal is to judge how well this generated question fullfills a criterion.
+
+The criterion is:
+Dependency Strength: Does Step 2 depend on the result of Step 1?
+
+1. Identify the Step 1 proposition.
+   Ask: What exact mechanism, condition, definition, limitation, assumption, objective, result, or interpretation must be derived from Paper 1?
+
+2. Check whether Step 1 is non-trivial.
+   Step 1 should be more than identifying a method, artifact, dataset, metric, or named entity.
+
+3. Check whether Step 1 is already leaked by the question.
+   If the question already states the Step 1 proposition, then Step 2 does not strongly depend on deriving it from Paper 1.
+
+4. Identify the Step 2 claim.
+   Ask: What exact result, application, observation, comparison, or finding comes from Paper 2?
+
+5. Test strict dependency.
+   Ask: Could Step 2 be answered or interpreted without applying the Step 1 proposition?
+   If yes, dependency is weak.
+
+6. Check for entity-linking.
+   If Step 1 only identifies an artifact/method and Step 2 only tracks that artifact/method in another paper, assign BAD or BORDERLINE, not GOOD.
+
+Finally, based on the previous steps, give a final judgement wether the question consists of 2 consecutive steps, where step 2 is only answerable by applying the results of step 1.
+
+JUDGEMENT OPTIONS:
+-GOOD: Step 2 strictly requires applying a proposition derived from Step 1. Step 1 must provide more than a named entity; it must provide a mechanism, condition, definition, limitation, assumption, guarantee, interpretation, objective, result, or similar.
+-BORDERLINE: Step 2 is related to Step 1, but the dependency is weak, mostly entity-linking, or one step can mostly be solved without the other.
+-BAD: Steps are independent, disconnected, or Step 1 only identifies a name/entity used in Step 2.
+
+INPUT:
+Question: {question}
+Answer: {answer}
+reasoning : {reasoning}
+bridgeEvidencePaperText: {paper1Text}
+bridgeAnswerPaperText: {paper2Text}
+
+OUTPUT_FORMAT
+{{
+"thinking": {{
+"step1Claim": <Describe the mechanism you extracted from step1>,
+"step1NotTrivial": {{
+"judgement": <true | false>,
+"explanation": <Describe why or why not step 1 is trivial>
+}},
+"step1LeakedByQuestion": {{
+"judgement": <true | false>,
+"explanation": <Describe why or why not step 1 is leaked by the question>
+}},
+"step2Claim": <Describe the mechanism you extracted from step2>,
+"strictDependency": {{
+"judgement": <true | false>,
+"explanation": <Describe why or why not step2 is stricly dependant on step1>
+}},
+"entityLinking": {{
+"judgement": <true | false>,
+"explanation": <Describe why or why not the question is just entity linking>
+}},
+}},
+"judgement": "<insert the final judgement, considering all previous evaluations here. Are both papers really required. Answer with: GOOD | BORDERLINE | BAD>",
+"explanation": "<thoroughly describe how good the question fulfills the multihop validity criteria and justify jour judgement based on previous evaluations>"
+}}
+
+Do not deviate from this schema. Do not add any preciding information like ```json. Only Answer with the valid json
+
+\end{lstlisting}
+
+
+\begin{lstlisting}[caption={Non-Decomposability Prompt}, label={lst:NonDecomposabilityPrompt}]
+    You are evaluating a scientific question-answer (Q-A) example. You are given a generated question, an answer and two paper texts. Your goal is to judge how well this generated question fullfills a criterion.
+
+The criterion is: Non-Decomposability: Is the question NOT decomposable into independent sub-questions?
+
+1. Ask what the answer for the question must explain, compare, justify, or conclude.
+2. Try to decompose the question into independent sub-questions.
+   For example:
+   What does Paper 1 say about X?
+   What does Paper 2 say about Y?
+   What result does Paper 2 report?
+   What mechanism does Paper 1 describe?
+3. Check whether each sub-question can be answered independently.
+   Ask whether the Paper 1 part and the Paper 2 part can each be solved without using the other.
+4. Check whether the final answer is just concatenation or comparison.
+   If the answer can be produced by separately retrieving facts from each paper and then simply joining them with "therefore," "in contrast," or "because," the question is decomposable.
+5. Check whether solving one part changes, constrains, or enables solving the other.
+   GOOD requires that one sub-answer materially affects how the other sub-answer is interpreted or answered.
+6. Check for artificial integration.
+   If the question appears integrated only because it mentions both papers, both methods, or both results, but the reasoning can still be split into independent lookups, assign BAD or BORDERLINE.
+7. Check whether the explanatory bridge is necessary.
+   If the question asks for "why" or "how," determine whether the bridge requires genuine synthesis or whether it is just a plausible comparison between independently retrieved facts.
+   Decide whether the question is truly non-decomposable.
+   If the answer requires integrated reasoning where one part constrains or enables the other, assign GOOD.
+   If the answer needs some interpretation but the sub-answers are mostly independent, assign BORDERLINE.
+   If the answer is mainly independent lookups plus concatenation/comparison, assign BAD.
+
+Finally, based on the previous steps, give a final judgement wether the question is decomposable into independant sub-questions.
+JUDGEMENT OPTIONS
+-GOOD: The question cannot be split into independent single-hop questions; solving one part changes, constrains, or enables solving the other.
+-BORDERLINE: The question is partially decomposable, but the sub-answers still need some linking or interpretation.
+-BAD: The question clearly decomposes into independent sub-questions whose answers can simply be concatenated.
+
+INPUT:
+Question: {question}
+Answer: {answer}
+bridgeEvidencePaperText: {paper1Text}
+bridgeAnswerPaperText: {paper2Text}
+
+OUTPUT_FORMAT
+{{
+"thinking": {{
+"mainQuestion":<Describe what the question must answer, explain, discuss, judge or similar>,
+"subquestions": [
+{{
+"question": <The first question that was the result of you question decomposition >
+"independentlyAnswerableBy": <give a verdict, wether the question can be independently solved by using either of the 3 options PAPER1 | PAPER2 | BOTH_PAPERS_TOGETHER>
+}},
+...
+],
+"concatenationOrComparison": {{
+            "judgement": <true | false>,
+            "explanation": "<explain whether the final answer can be produced by concatenating or simply comparing separately retrieved facts>"
+        }},
+"onePartConstrainsOther": {{
+            "judgement": <true | false>,
+            "explanation": "<explain whether solving one part changes, constrains, or enables solving the other>"
+        }},
+"artificialIntegration": {{
+            "judgement": <true | false>,
+            "explanation": "<explain whether the question only appears integrated because it mentions both papers, methods, entities, or results>"
+        }},
+"necessaryExplanatoryBridge": {{
+            "judgement": <true | false>,
+            "explanation": "<explain whether the explanatory bridge requires genuine synthesis or is just a plausible comparison>"
+        }}
+}},
+"judgement": "<insert the final judgement, considering all previous evaluations here. Are both papers really required. Answer with: GOOD | BORDERLINE | BAD>",
+"explanation": "<thoroughly describe how good the question fulfills the multihop validity criteria and justify jour judgement based on previous evaluations>"
+}}
+
+Do not deviate from this schema. Do not add any preciding information like ```json. Only Answer with the valid json
+
+\end{lstlisting}
+
+
+\begin{lstlisting}[caption={Evidence Distribution Prompt}, label={lst:EvidenceDistributionPrompt}]
+    You are evaluating a scientific question-answer (Q-A) example. You are given a generated question, an answer and two paper texts. Your goal is to judge how well this generated question fullfills a criterion.
+
+The criterion is: Evidence Distribution: Are both papers required and non-redundant?
+
+Important:
+
+- The answer is a candidate answer, not evidence.
+- Use the answer only as a clue to the intended response.
+- Judge what evidence is actually required to answer the question.
+- Verify all claims directly against the two paper texts.
+- Be strict: assign GOOD only if both papers provide distinct, necessary, non-redundant evidence.
+
+Judging procedure:
+
+1. Identify the evidence needed to answer the question.
+   Break the answer into evidence pieces, not just topics or method names.
+
+2. List exactly what Paper 1 contributes.
+   Ask whether Paper 1 provides a necessary intermediate proposition, mechanism, condition, definition, limitation, assumption, objective, result, or interpretation.
+   Ask which of the evidence from 1. it contributes.
+
+3. List exactly what Paper 2 contributes.
+   Ask whether Paper 2 provides necessary evidence whose meaning depends on applying the Paper 1 contribution.
+   Ask which of the evidence from 1. it contributes.
+
+4. Check whether either paper is dominant.
+   If one paper contains the task, result, comparison, method description, and enough context to answer the main question, while the other only adds support or detail, Evidence Distribution is not GOOD.
+
+5. Check for redundancy or overlap.
+   Ask whether both papers provide the same or overlapping information regarding the evidence needed for answering the question, or whether one paper repeats/elaborates what the other paper or the question already states.
+
+6. Check for thin or artifact-only evidence roles.
+   Ask whether one paper's contribution is only naming, defining, or describing an artifact/method while the other paper provides the substantive task-specific evidence. If so, the evidence distribution is weak because one paper has only a background/detail role.
+
+Finally, based on the previous steps, give a final judgement wether the question targets information distributed above both papers.
+Judgement options:
+-GOOD: Each paper contributes distinct, necessary information. One paper provides an intermediate proposition, and the other provides evidence whose meaning depends on applying that proposition.
+-BORDERLINE: Both papers contribute, but there is overlap, redundancy, or one paper is dominant while the other only adds support.
+-BAD: One paper is sufficient; the other is redundant, only background, or only provides the name/source of an artifact.
+
+Input:
+Question: {question}
+Answer: {answer}
+paper1Text: {paper1Text}
+paper2Text: {paper2Text}
+
+OUTPUT_FORMAT
+{{
+"thinking": {{
+"evidenceNeeded": [
+<List evidence that is needed to answer the question>
+],
+"evidencePaper1": [
+<List evidence that paper 1 contribues>
+
+        ],
+        "evidencePaper2": [
+            <List evidence that paper 2 contribues>
+        ],
+        "paperDominance": {{
+            "dominantPaper": <answer with either PAPER1 | PAPER2 | NONE depending on if a paper is dominant or not>,
+            "explanation": <explain why or why not either paper is dominant>
+        }},
+        "informationRedundancy": {{
+            "judgement": <true | false>,
+            "explanation": <explain why or why not the information from both papers is redundant>
+        }},
+        "artifactOnlyEvidence": {{
+            "judgement": <true | false>,
+            "explanation": <explain why or why not one paper's contribution is artifact only evidence>
+        }}
+    }},
+    "judgement": "<insert the final judgement, considering all previous evaluations here. Does the question target evidence distributed across both papers? Answer with: GOOD | BORDERLINE | BAD>",
+    "explanation": "<thoroughly describe how good the question fulfills the evidence distribution criteria and justify jour judgement based on previous evaluations>"
+}}
+Do not deviate from this schema. Do not add any preciding information like ```json. Only Answer with the valid json
+
+
+\end{lstlisting}
+
+
+\begin{lstlisting}[caption={Answerability Prompt}, label={lst:AnswerabilityPrompt}]
+    You are evaluating a scientific question-answer (Q-A) example. You are given a generated question, a candidate answer, and two paper texts. Your goal is to judge how well the candidate answer fulfills this criterion:
+
+Answerability: Is the answer fully supported by the provided evidence?
+
+Important:
+
+- The answer is a candidate answer, not evidence.
+- Verify the answer directly against the two paper texts.
+- Do not use external knowledge.
+- Be strict: assign GOOD only if all central parts of the answer are fully supported by the provided papers.
+- If the answer contains an explanation such as "because", "therefore", "why, "explains", "accounts for" or "makes X better/worse" verify that this explanatory link is supported, not just the individual facts
+
+Judging procedure:
+
+1. Break the candidate answer into the minimum claims needed to answer the question.
+   Do not over-penalize irrelevant extra wording unless it affects the answer.
+
+2. For each answer claim, identify whether it is supported by:
+   - paper1
+   - paper2
+   - both
+   - question_only
+   - unsupported_or_inferred
+
+3. Check whether every answer claim is directly supported by the paper texts.
+   A good question must have the claims supported by the the paper texts, not by the question or unsopported or inferered.
+
+4. Check whether any explanation or causal bridge is only inferred, instead of backed by evidence.
+
+5. Check whether any answer claim is contradicted by the papers.
+
+Finally, based on the previous steps, give a final judgement wether the question is fully answerable using the papers.
+
+JUDGEMENT OPTIONS:
+
+- GOOD: Fully supported by the provided evidence from the papers; no external knowledge, speculation, or unsupported inference is needed.
+- BORDERLINE: Partially supported, but some part of the answer requires mild inference, is under-specified, or is not directly grounded.
+- BAD: Not supported, contradicted by the evidence, or requires external knowledge/speculation.
+
+INPUT:
+Question: {question}
+Answer: {answer}
+bridgeEvidencePaperText: {paper1Text}
+bridgeAnswerPaperText: {paper2Text}
+
+OUTPUT FORMAT:
+{{
+  "thinking": {{
+    "answerClaims": [
+      {{
+        "claim": "<The first claim extracted from the answer.>",
+        "supportedBy" <insert by which source this claim is supported, answer with either:  paper1 | paper2 | both | question_only | unsupported_or_inferred>,
+        "evidence: <explain why this claim is supported by the source>,
+      }},
+...
+],
+"allClaimsSupported": {{
+      "judgement": <true | false>,
+      "explanation": "<explain whether all claims are directly supported by the papers>"
+    }},
+"unsupportedInferenceOrBridge": {{
+      "present": <true | false>,
+      "explanation": "<explain whether the answer requires inference, an unsupported explanatory bridge, speculation, or external knowledge>"
+    }},
+"contradiction": {{
+      "present": <true | false>,
+      "explanation": "<explain whether any answer claim is contradicted by the papers>"
+    }}
+}},
+"judgement": "<GOOD | BORDERLINE | BAD>",
+"explanation": "<justify the Answerability judgement using your previous analysis from above>"
+}}
+
+Do not deviate from this schema. Do not add any preceding information such as ```json. Only answer with valid JSON.
+
+\end{lstlisting}
+
+
+\begin{lstlisting}[caption={decontextualization Prompt}, label={lst:decontextualizationPrompt}]
+You are evaluating a scientific question-answer (Q-A) example. You are given a generated question, a candidate answer, and two paper texts. Your goal is to judge how well the generated question fulfills this criterion:
+
+Decontextualization: Is the question self-contained and unambiguous?
+
+Important:
+
+- Judge the question itself, not the answer.
+- Do not penalize technical terminology if the relevant entities, methods, datasets, metrics, or concepts are clearly named or described.
+- Do not require the question to be easy for a layperson; it only needs to be understandable as a standalone scientific question.
+- Be strict: assign GOOD only if the question can be understood without seeing the papers.
+- Do not use this criterion to judge multi-hop validity, evidence distribution, or answerability.
+
+Judging procedure:
+
+1. Check whether the question contains explicit paper references.
+   Look for phrases such as:
+   - "in this paper"
+   - "the proposed method"
+   - "this approach"
+   - "the authors"
+   - "the study"
+   - "the first paper"
+   - "the second paper"
+   - "the method described above"
+   - "their results"
+     If such references are needed to understand the question, the question is not fully decontextualized.
+
+2. Check whether all key entities and concepts are named or clearly described.
+   Ask whether the question clearly identifies the relevant methods, models, datasets, metrics, tasks, phenomena, or domain setting.
+
+3. Check for ambiguous pronouns or underspecified references.
+   Look for unclear uses of "it," "this," "that," "the model," "the method," "the metric," "the approach," or similar.
+
+4. Check for copied distinctive phrasing that turns the question into a lexical lookup.
+   Technical terminology is allowed, but the question should not merely copy a long distinctive phrase from a paper to make retrieval trivial.
+
+Finally, based on the previous steps, give a final judgement whether the question is self-contained and unambiguous.
+
+Judgement options:
+
+- GOOD: The question is understandable on its own, names or describes all required entities/concepts, and contains no paper-dependent references.
+- BORDERLINE: The question is mostly self-contained but has minor ambiguity, underspecification, or slightly paper-dependent phrasing.
+- BAD: The question relies on paper context, explicit paper references, ambiguous references, or is not understandable on its own.
+
+Input:
+Question: {question}
+Answer: {answer}
+paper1Text: {paper1Text}
+paper2Text: {paper2Text}
+
+Output format:
+{{
+  "thinking": {{
+    "explicitPaperReferences": {{
+      "judgement": <true | false>,
+      "examples": [
+        "<quote any explicit paper-dependent reference, or leave empty>"
+      ],
+      "explanation": "<explain whether the question contains explicit references to the papers or authors>"
+    }},
+"keyEntitiesAndConceptsNamed": {{
+      "judgement": <true | false>,
+      "missingOrUnclearItems": [
+        "<state any missing or unclear entity/concept, or leave empty>"
+      ],
+      "explanation": "<explain whether the question names or clearly describes the necessary entities and concepts>"
+    }},
+"ambiguousReferences": {{
+      "judgement": <true | false>,
+      "examples": [
+        "<quote any ambiguous pronoun/reference, or leave empty>"
+      ],
+      "explanation": "<explain whether the question contains ambiguous references>"
+    }},
+"hiddenPaperContextRequired": {{
+      "present": <true | false>,
+      "explanation": "<explain whether understanding the question requires seeing the papers>"
+    }}
+}},
+"judgement": "<GOOD | BORDERLINE | BAD>",
+"explanation": "<justify the Decontextualization judgement using the diagnostics above>"
+}}
+
+Do not deviate from this schema. Do not add any preceding information such as ```json. Only answer with valid JSON.
+
+\end{lstlisting}
+
+
+
+
+
 
 
 \begin{lstlisting}[caption={DIRE prompt}, label={lst:DIRE prompt}]
